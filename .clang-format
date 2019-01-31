@@ -1,0 +1,7 @@
+﻿---
+BreakBeforeBraces: Attach
+IndentWidth: '4'
+Language: Cpp
+TabWidth: '4'
+
+...

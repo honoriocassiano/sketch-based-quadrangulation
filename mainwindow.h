@@ -15,6 +15,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+  void loadMesh();
+
 private:
     Ui::MainWindow *ui;
 };
