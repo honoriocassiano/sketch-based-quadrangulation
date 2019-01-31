@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "application.h"
 #include "qdebug.h"
 #include "qfiledialog.h"
 
@@ -18,6 +19,9 @@ void MainWindow::loadMesh() {
         this, tr("Open Mesh"), "./", tr("Poly Model (*.ply *.obj *.off)"));
 
     if (!fileName.isEmpty()) {
-        qDebug() << fileName;
+        //        qDebug() << fileName;
+        Application app;
+
+        app.loadMesh(fileName);
     }
 }
