@@ -8,14 +8,19 @@ Application::Application() {}
 
 Application::~Application() {}
 
-bool Application::loadMesh(QString filename) {
+Status Application::loadMesh(std::string filename) {
     mesh.Clear();
-    int err = vcg::tri::io::Importer<PMesh>::Open(
-        mesh, filename.toStdString().c_str());
+    int err = vcg::tri::io::Importer<PMesh>::Open(mesh, filename.c_str());
 
     if (!err) {
         qDebug() << "NO ERROR! " << mesh.face.size();
+
+        return STATUS_OK;
     } else {
         qDebug() << "ERROR!";
+
+        qDebug() << vcg::tri::io::Importer<PMesh>::ErrorMsg(err);
+
+        return Status{false, vcg::tri::io::Importer<PMesh>::ErrorMsg(err)};
     }
 }

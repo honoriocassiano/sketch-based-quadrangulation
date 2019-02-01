@@ -3,7 +3,8 @@
 
 #include "meshtypes.h"
 
-#include <qstring.h>
+#include <string>
+#include <utils.h>
 
 class Application {
   public:
@@ -11,7 +12,7 @@ class Application {
 
     virtual ~Application();
 
-    bool loadMesh(QString filename);
+    Status loadMesh(std::string filename);
 
   private:
     PMesh mesh;

@@ -8,7 +8,7 @@ QT       += core xml core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = sketch-based-quadrangulation
+TARGET = sbq
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -47,7 +47,8 @@ HEADERS += \
         mainwindow.h \
     application.h \
     viewer.h \
-    meshtypes.h
+    meshtypes.h \
+    utils.h
 
 FORMS += \
         mainwindow.ui

@@ -16,7 +16,12 @@ public:
     ~MainWindow();
 
 public slots:
-  void loadMesh();
+    void loadMesh();
+
+//    void updateStatusBar(QString message);
+
+signals:
+    void notifyStatusBar(QString);
 
 private:
     Ui::MainWindow *ui;

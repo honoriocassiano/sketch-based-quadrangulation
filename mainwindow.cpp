@@ -5,11 +5,16 @@
 #include "qdebug.h"
 #include "qfiledialog.h"
 
+#include "utils.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
     connect(ui->loadMeshButton, SIGNAL(clicked()), this, SLOT(loadMesh()));
+
+    connect(this, SIGNAL(notifyStatusBar(QString)), ui->statusBar,
+            SLOT(showMessage(QString)));
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -22,6 +27,8 @@ void MainWindow::loadMesh() {
         //        qDebug() << fileName;
         Application app;
 
-        app.loadMesh(fileName);
+        Status status = app.loadMesh(fileName.toStdString());
+
+        emit notifyStatusBar(QString::fromStdString(status.message));
     }
 }
