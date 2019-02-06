@@ -32,6 +32,8 @@ INCLUDEPATH += $$VCGLIB_PATH/ $$LIBQGLVIEWER_PATH
 LIBS += -L$$LIBQGLVIEWER_PATH -lQGLViewer-qt5 -lGLEW  -lGLU -lGL -fopenmp
 #LIBS += -lQGLViewer-qt5
 
+DESTDIR =       $$PWD/bin
+
 # Subprojects
 SUBDIRS = \
         $$LIBQGLVIEWER_PATH
@@ -41,14 +43,20 @@ SOURCES += \
     vcglib/wrap/ply/plylib.cpp \
     mainwindow.cpp \
     application.cpp \
-    viewer.cpp
+    utils/standardCamera.cpp \
+    viewer.cpp \
+    utils/manipulatedFrameSetConstraint.cpp
 
 HEADERS += \
         mainwindow.h \
     application.h \
     viewer.h \
     meshtypes.h \
-    utils.h
+    utils/utils.h \
+    utils/standardCamera.h \
+    utils/qutils.h\
+    utils/manipulatedFrameSetConstraint.h \
+    utils/object.h
 
 FORMS += \
         mainwindow.ui

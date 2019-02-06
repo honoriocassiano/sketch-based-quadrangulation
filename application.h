@@ -4,7 +4,7 @@
 #include "meshtypes.h"
 
 #include <string>
-#include <utils.h>
+#include <utils/utils.h>
 
 class Application {
   public:
@@ -13,6 +13,8 @@ class Application {
     virtual ~Application();
 
     Status loadMesh(std::string filename);
+
+    void drawMesh() const;
 
   private:
     PMesh mesh;
