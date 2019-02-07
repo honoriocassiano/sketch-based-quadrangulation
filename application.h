@@ -14,6 +14,8 @@ class Application {
 
     Status loadMesh(std::string filename);
 
+    PMesh *getMesh();
+
     void drawMesh() const;
 
   private:

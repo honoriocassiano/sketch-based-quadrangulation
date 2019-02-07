@@ -28,6 +28,8 @@ Status Application::loadMesh(std::string filename) {
     }
 }
 
+PMesh *Application::getMesh() { return &mesh; }
+
 void Application::drawMesh() const {
     glPushMatrix();
 

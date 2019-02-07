@@ -4,16 +4,72 @@
 #include "QGLViewer/manipulatedFrame.h"
 
 #include "utils/qutils.h"
+#include "vcg/complex/algorithms/intersection.h"
 
 namespace qgl = qglviewer;
+
+/*
+ CURVEDRAW CLASS DEFINITIONS
+*/
+
+CurveDraw::CurveDraw() : drawMode(false) {}
+
+CurveDraw::~CurveDraw() {}
+
+bool CurveDraw::isDrawing() const { return drawMode; }
+
+QVector<qglviewer::Vec> CurveDraw::getPoints() const { return points; }
+
+void CurveDraw::startDraw(const qglviewer::Vec &firstPoint) {
+    reset();
+
+    points.push_back(firstPoint);
+}
+
+void CurveDraw::addPoint(const qglviewer::Vec &point) {
+    if (drawMode) {
+        points.push_back(point);
+    }
+}
+
+void CurveDraw::reset() { points.clear(); }
+
+void CurveDraw::endDraw() { drawMode = false; }
+
+qgl::Vec CurveDraw::getMousePosition3D(const qglviewer::Camera *cam,
+                                       const QPoint &ip) const {
+    qglviewer::Vec point(ip.x(), ip.y(), 0.5);
+    point = cam->unprojectedCoordinatesOf(point);
+    qglviewer::Vec dir = point - cam->position();
+    dir.normalize();
+    // parameter of the plane where we are goint to project
+    // see
+    // http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
+    qglviewer::Vec normalPlane = cam->viewDirection();
+    qreal nl = normalPlane * dir;
+    assert(nl > 1e-8);
+    qglviewer::Vec l0 = cam->position();
+    //        qglviewer::Vec p0 = l0 + 0.5 * normalPlane;
+    qglviewer::Vec p0 = l0 + normalPlane;
+    qglviewer::Vec p0l0 = p0 - l0;
+    qreal distance = p0l0 * normalPlane / nl;
+    dir = distance * dir;
+    qglviewer::Vec pos = l0 + dir;
+
+    return pos;
+}
+
+/*
+ VIEWER CLASS DEFINITIONS
+*/
 
 Viewer::Viewer(QWidget *parent) : QGLViewer(parent) {
 
     auto *sc = new StandardCamera();
     auto *c = this->camera();
 
-    c->fitSphere(qgl::Vec(0, 0, 0), 20);
-    sc->setPosition(qglviewer::Vec(0, 0, 20));
+    sc->fitSphere(qgl::Vec(0, 0, 0), 10);
+    //    sc->setPosition(qglviewer::Vec(0, 0, 20));
 
     this->setCamera(sc);
 
@@ -57,6 +113,67 @@ void Viewer::init() {
 }
 
 // void Viewer::update() { draw(); }
+
+void Viewer::mousePressEvent(QMouseEvent *e) {
+    // Start selection. Mode is ADD with Shift key and TOGGLE with Alt key.
+
+    //    drawer.startDraw();
+
+    //    qDebug() <<
+
+    auto position =
+        qtToVCG(drawer.getMousePosition3D(this->camera(), e->pos()));
+
+    qDebug() << "Position 3D: " << vcgToQT(position);
+
+    this->camera()->position();
+
+    qgl::Vec orig, dir;
+
+    this->camera()->convertClickToLine(e->pos(), orig, dir);
+
+    //    qDebug() << orig;
+    //    qDebug() << dir;
+
+    Point3<CMesh::ScalarType> hitPoint;
+    Line3<CMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
+
+    PMesh::ScalarType b1, b2, b3;
+    PMesh::FacePointer face = nullptr;
+
+    if (vcg::IntersectionRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3,
+                                 face)) {
+        qDebug() << "HIT: " << vcgToQT(hitPoint) << " :D";
+
+        qDebug() << "FACE: " << face;
+    } else {
+        qDebug() << ":(";
+        //        QGLViewer::mousePressEvent(e);
+    }
+
+    QGLViewer::mousePressEvent(e);
+}
+
+void Viewer::mouseMoveEvent(QMouseEvent *e) {
+    /*if (modeTemporal == InputCurve) {
+         if (!painter.isDrawing)
+             return;
+         painter.CurrentPoint =
+             painter.mousePosition3D(this->camera(), e->pos());
+         painter.points.push_back(painter.CurrentPoint);
+         painter.addSegmentStroke(painter.LastPoint, painter.CurrentPoint);
+         painter.LastPoint = painter.CurrentPoint;
+         // cout<<"added "<<painter.CurrentPoint.x<<"
+         // "<<painter.CurrentPoint.y<<" "<<painter.CurrentPoint.z<<endl;
+         // tri::Clean<CMesh>::RemoveDuplicateVertex(painter.LineStroke);
+         // tri::Clean<CMesh>::RemoveUnreferencedVertex(painter.LineStroke);
+         // tri::Allocator<CMesh>::CompactEveryVector(painter.LineStroke);
+         update();
+     } else {
+         QGLViewer::mouseMoveEvent(e);
+     }*/
+    QGLViewer::mouseMoveEvent(e);
+}
 
 void Viewer::draw() {
 
