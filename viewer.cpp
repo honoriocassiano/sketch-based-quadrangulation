@@ -3,19 +3,17 @@
 
 #include "QGLViewer/manipulatedFrame.h"
 
-#include "utils/manipulatedFrameSetConstraint.h"
 #include "utils/qutils.h"
+
+namespace qgl = qglviewer;
 
 Viewer::Viewer(QWidget *parent) : QGLViewer(parent) {
 
     auto *sc = new StandardCamera();
     auto *c = this->camera();
 
-    sc->setPosition(qglviewer::Vec(0, 0, 10));
-
-    qDebug() << sc->position();
-    qDebug() << sc->upVector();
-    qDebug() << sc->viewDirection();
+    c->fitSphere(qgl::Vec(0, 0, 0), 20);
+    sc->setPosition(qglviewer::Vec(0, 0, 20));
 
     this->setCamera(sc);
 
@@ -37,15 +35,15 @@ Application *Viewer::getApp() { return &app; }
 
 void Viewer::init() {
 
-    this->setManipulatedFrame(new qglviewer::ManipulatedFrame());
+    //    this->setManipulatedFrame(new qglviewer::ManipulatedFrame());
 
-    auto constraint = new ManipulatedFrameSetConstraint();
-    constraint->addObjectToSet(new Object());
+    //    auto constraint = new ManipulatedFrameSetConstraint();
+    //    constraint->addObjectToSet(new Object());
 
-    this->manipulatedFrame()->setConstraint(constraint);
+    //    this->manipulatedFrame()->setConstraint(constraint);
 
     //    setBackgroundColor(QColor(0, 0, 0));
-    setBackgroundColor(QColor(255, 255, 255));
+    //    setBackgroundColor(QColor(255, 255, 255));
     //    restoreStateFromFile();
 
     //    glClearColor(0, 0, 0, 1);

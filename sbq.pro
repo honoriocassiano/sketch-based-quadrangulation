@@ -44,8 +44,7 @@ SOURCES += \
     mainwindow.cpp \
     application.cpp \
     utils/standardCamera.cpp \
-    viewer.cpp \
-    utils/manipulatedFrameSetConstraint.cpp
+    viewer.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -55,7 +54,6 @@ HEADERS += \
     utils/utils.h \
     utils/standardCamera.h \
     utils/qutils.h\
-    utils/manipulatedFrameSetConstraint.h \
     utils/object.h
 
 FORMS += \

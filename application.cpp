@@ -69,9 +69,9 @@ void Application::drawMesh() const {
 
     //    glBegin(GL_POLYGON);
     //    glColor3f(1.0, 1.0, 1.0);
-    glColor3f(1, 0, 0);
+    //    glColor3f(1, 0, 0);
     //    glPointSize(5.0);
-    glBegin(GL_POINTS);
+    //    glBegin(GL_POINTS);
 
     //    qDebug() << "size: " << mesh.vert.size();
 
