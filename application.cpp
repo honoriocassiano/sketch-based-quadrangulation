@@ -44,73 +44,24 @@ Status Application::hideMesh() {
     return STATUS_OK;
 }
 
-void Application::drawMesh() const {
+void Application::draw() const {
+
     glPushMatrix();
+    if (state.meshVisible) {
 
-    //    glTranslatef(0, 0, -10);
-    //    glScale(50.0);
-    //    glTranslate(-center);
-    //    switch (draw) {
-    //    case 0: {
-    //        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    //        break;
-    //    }
-    //    case 3: {
-    //        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    //        glLineWidth(1);
-    //        break;
-    //    }
-    //    default:
-    //        break;
-    //    }
-    //    if (draw != 4) {
-    //        for (unsigned int i = 0; i < mesh.face.size(); i++) {
-    //            vcg::glColor(mesh.face[i].C());
+        for (auto it = mesh.face.begin(); it != mesh.face.end(); ++it) {
+            //    for (auto it = mesh.vert.begin(); it != mesh.vert.end(); ++it)
+            //    {
+            //        vcg::glVertex(it->P());
+            glBegin(GL_POLYGON);
 
-    //            if (mesh.face[i].IsD())
-    //                continue;
-    //            if (!flagSeeSelectedQuad && mesh.face[i].IsS())
-    //                continue;
-    //            if (draw == 2)
-    //                glBegin(GL_POINTS);
-    //            else
-    //                glBegin(GL_POLYGON);
-    //            vcg::glNormal(mesh.face[i].N());
-    //            // assert (secondmesh.face[i].VN() == 4);
-    //            for (int j = 0; j < mesh.face[i].VN(); j++)
-    //                vcg::glVertex(mesh.face[i].V(j)->P());
-    //            glEnd();
-    //        }
-    //    }
+            for (int j = 0; j < it->VN(); j++) {
+                vcg::glVertex(it->V(j)->P());
+            }
 
-    //    glBegin(GL_POLYGON);
-    //    glColor3f(1.0, 1.0, 1.0);
-    //    glColor3f(1, 0, 0);
-    //    glPointSize(5.0);
-    //    glBegin(GL_POINTS);
-
-    //    qDebug() << "size: " << mesh.vert.size();
-
-    for (auto it = mesh.face.begin(); it != mesh.face.end(); ++it) {
-        //    for (auto it = mesh.vert.begin(); it != mesh.vert.end(); ++it) {
-        //        vcg::glVertex(it->P());
-        glBegin(GL_POLYGON);
-
-        for (int j = 0; j < it->VN(); j++) {
-            vcg::glVertex(it->V(j)->P());
+            glEnd();
         }
-
-        glEnd();
     }
-
-    //    for (auto it = mesh.vert.begin(); it != mesh.vert.end(); ++it) {
-    //        vcg::glVertex(it->P());
-    //    }
-    //    vcg::glVertex();
-    //    for (int j = 0; j < mesh.face[i].VN(); j++)
-    //        vcg::glVertex(mesh.face[i].V(j)->P());
-    //    glEnd();
-
     glPopMatrix();
 }
 

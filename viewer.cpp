@@ -31,6 +31,7 @@ Viewer::~Viewer() {}
 Status Viewer::loadMesh(QString filename) {
 
     auto st = app.loadMesh(filename.toStdString());
+    app.showMesh();
 
     update();
 
@@ -153,7 +154,7 @@ void Viewer::draw() {
 
     //    qDebug() << "draw";
 
-    app.drawMesh();
+    app.draw();
 
     // glClearColor(1.0f, 1.0f, 1.0f, 0.0f);	// White Background
     // glClearColor(0.2f, 0.8f, 0.2f, 0.0f);	// Green Background
