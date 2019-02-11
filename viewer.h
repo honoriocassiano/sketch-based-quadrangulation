@@ -26,26 +26,41 @@ class CurveDraw {
      * \brief Get all points added to drawing
      * \return vector containing the points
      */
-    QVector<qgl::Vec> getPoints() const;
+    QVector<vcg::Point3<PMesh::ScalarType>> getPoints() const;
 
     /*!
      * \brief Start draw mode after calls CurveDraw::reset()
      * \param firstPoint first point to add to drawing
+     * \param face face that contains the point
      * \sa CurveDraw::reset()
      */
-    void startDraw(const qgl::Vec &firstPoint);
+    void startDraw();
 
     /*!
      * \brief Add a point to drawing. If drawing mode is not active, the point
      * is ignored
      * \param point point to add
+     * \param face face that contains the point
      */
-    void addPoint(const qgl::Vec &point);
+    void addPoint(const vcg::Point3<PMesh::ScalarType> &point,
+                  PMesh::FacePointer face);
 
     /*!
      * \brief Deactivate drawing mode
      */
     void endDraw();
+
+    /*!
+     * \brief Get the number of points added to draw
+     * \return number of points
+     */
+    inline int getSize() const { return addedPoints.size(); }
+
+    /*!
+     * \brief Delete all added points (but not deactivate drawing mode)
+     * \sa CurveDraw::endDraw()
+     */
+    void reset();
 
     /*!
      * \brief Return the intersection with plane z=0 using the camera and a
@@ -54,18 +69,13 @@ class CurveDraw {
      * \param ip position relative to window
      * \return point of collision with plane z=0
      */
-    qgl::Vec getMousePosition3D(const qglviewer::Camera *cam,
-                                const QPoint &ip) const;
-
-    /*!
-     * \brief Delete all added points (but not deactivate drawing mode)
-     * \sa CurveDraw::endDraw()
-     */
-    void reset();
+    static qgl::Vec getMousePosition3D(const qglviewer::Camera *cam,
+                                       const QPoint &ip);
 
   private:
     bool drawMode;
-    QVector<qgl::Vec> points;
+    QVector<PMesh::FacePointer> faces;
+    QVector<vcg::Point3<PMesh::ScalarType>> addedPoints;
 };
 
 class Viewer : public QGLViewer {

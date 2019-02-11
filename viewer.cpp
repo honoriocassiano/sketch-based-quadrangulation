@@ -19,26 +19,32 @@ CurveDraw::~CurveDraw() {}
 
 bool CurveDraw::isDrawing() const { return drawMode; }
 
-QVector<qglviewer::Vec> CurveDraw::getPoints() const { return points; }
-
-void CurveDraw::startDraw(const qglviewer::Vec &firstPoint) {
-    reset();
-
-    points.push_back(firstPoint);
+QVector<vcg::Point3<PMesh::ScalarType>> CurveDraw::getPoints() const {
+    return addedPoints;
 }
 
-void CurveDraw::addPoint(const qglviewer::Vec &point) {
+void CurveDraw::startDraw() {
+    reset();
+    drawMode = true;
+}
+
+void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
+                         PMesh::FacePointer face) {
     if (drawMode) {
-        points.push_back(point);
+        addedPoints.push_back(point);
+        faces.push_back(face);
     }
 }
 
-void CurveDraw::reset() { points.clear(); }
+void CurveDraw::reset() {
+    addedPoints.clear();
+    faces.clear();
+}
 
 void CurveDraw::endDraw() { drawMode = false; }
 
 qgl::Vec CurveDraw::getMousePosition3D(const qglviewer::Camera *cam,
-                                       const QPoint &ip) const {
+                                       const QPoint &ip) {
     qglviewer::Vec point(ip.x(), ip.y(), 0.5);
     point = cam->unprojectedCoordinatesOf(point);
     qglviewer::Vec dir = point - cam->position();
@@ -123,7 +129,7 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
     //    qDebug() <<
 
     auto position =
-        qtToVCG(drawer.getMousePosition3D(this->camera(), e->pos()));
+        qtToVCG(CurveDraw::getMousePosition3D(this->camera(), e->pos()));
 
     qDebug() << "Position 3D: " << vcgToQT(position);
 
@@ -145,11 +151,23 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
     //    if (vcg::IntersectionRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3,
     //                                 face)) {
     if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
-        qDebug() << "HIT: " << vcgToQT(hitPoint) << " :D";
 
-        qDebug() << "B1,2,3: " << b1 << ", " << b1 << ", " << b3;
+        if (drawer.getSize() < 3) {
 
-        qDebug() << "FACE: " << face;
+            if (!drawer.isDrawing()) {
+                drawer.startDraw();
+            }
+
+            drawer.addPoint(hitPoint, face);
+        }
+
+        //        qDebug() << "HIT: " << vcgToQT(hitPoint) << " :D";
+
+        //        qDebug() << "B1,2,3: " << b1 << ", " << b1 << ", " << b3;
+
+        //        qDebug() << "FACE: " << face;
+
+        qDebug() << drawer.getPoints();
     } else {
         qDebug() << ":(";
         //        QGLViewer::mousePressEvent(e);

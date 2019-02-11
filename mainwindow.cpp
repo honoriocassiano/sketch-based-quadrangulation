@@ -28,8 +28,9 @@ void MainWindow::loadMesh() {
     //    qDebug() << fileName;
 
     //    QString fileName = "../models/3holes_quad.obj";
-    QString fileName = "../models/cube.obj";
+    //    QString fileName = "../models/cube.obj";
     //    QString fileName = "../models/cube_tri.obj";
+    QString fileName = "../models/magnolia.obj";
 
     if (!fileName.isEmpty()) {
         //        qDebug() << fileName;

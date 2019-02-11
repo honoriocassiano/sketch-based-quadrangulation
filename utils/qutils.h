@@ -4,11 +4,19 @@
 #include "QGLViewer/vec.h"
 #include <QDebug>
 
+#include "meshtypes.h"
 #include "vcg/space/point3.h"
 
 QDebug operator<<(QDebug dbg, const qglviewer::Vec &c) {
     QDebugStateSaver saver(dbg);
     dbg.nospace() << "(" << c.x << ", " << c.y << ", " << c.z << ")";
+
+    return dbg;
+}
+
+QDebug operator<<(QDebug dbg, const vcg::Point3<PMesh::ScalarType> &p) {
+    QDebugStateSaver saver(dbg);
+    dbg.nospace() << "(" << p.X() << ", " << p.Y() << ", " << p.Z() << ")";
 
     return dbg;
 }
