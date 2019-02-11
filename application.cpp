@@ -38,6 +38,13 @@ Status Application::showMesh() {
     return Status::make(false, "Cannot display an empty mesh!");
 }
 
+Status Application::switchShowingMesh() {
+    if (state.meshVisible) {
+        return hideMesh();
+    }
+    return showMesh();
+}
+
 Status Application::hideMesh() {
     state.meshVisible = false;
 

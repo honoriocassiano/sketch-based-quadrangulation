@@ -35,6 +35,8 @@ class Application {
      */
     Status showMesh();
 
+    Status switchShowingMesh();
+
     inline bool isShowingMesh() const { return state.meshVisible; }
 
     /*!

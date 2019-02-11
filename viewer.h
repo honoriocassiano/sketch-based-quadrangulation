@@ -17,6 +17,8 @@ class Viewer : public QGLViewer {
 
     Status loadMesh(QString filename);
 
+    void setFocus() { QGLViewer::setFocus(); }
+
   protected:
     void init() override;
     void draw() override;
@@ -26,9 +28,10 @@ class Viewer : public QGLViewer {
     //    virtual QString helpString() const;
 
     //    /// keyboard and mouse event callbacks
-    //    virtual void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent *e) override;
 
   signals:
+    void notifyStatusBar(QString);
 
   public slots:
 

@@ -142,6 +142,19 @@ void Viewer::mouseMoveEvent(QMouseEvent *e) {
     QGLViewer::mouseMoveEvent(e);
 }
 
+void Viewer::keyPressEvent(QKeyEvent *e) {
+    if (e->key() == Qt::Key::Key_M) {
+
+        auto st = app.switchShowingMesh();
+
+        if (!st.result) {
+            emit notifyStatusBar(QString::fromStdString(st.message));
+        }
+    }
+
+    update();
+}
+
 void Viewer::draw() {
 
     //    qDebug() << "aaa";
