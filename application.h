@@ -1,10 +1,11 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "curvedraw.h"
 #include "meshtypes.h"
+#include "utils/utils.h"
 
 #include <string>
-#include <utils/utils.h>
 
 class Application {
 
@@ -22,14 +23,18 @@ class Application {
 
     Status loadMesh(std::string filename);
     Status showMesh();
+    inline bool isShowingMesh() const { return state.meshVisible; }
     Status hideMesh();
 
-    PMesh *getMesh();
+    inline PMesh *getMesh() { return &mesh; }
+
+    inline CurveDraw *getDrawer() { return &drawer; }
 
     void drawMesh() const;
 
   private:
     PMesh mesh;
+    CurveDraw drawer;
 
     CurrentState state;
 };

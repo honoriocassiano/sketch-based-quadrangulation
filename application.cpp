@@ -44,8 +44,6 @@ Status Application::hideMesh() {
     return STATUS_OK;
 }
 
-PMesh *Application::getMesh() { return &mesh; }
-
 void Application::drawMesh() const {
     glPushMatrix();
 

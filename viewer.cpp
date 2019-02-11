@@ -10,63 +10,6 @@
 namespace qgl = qglviewer;
 
 /*
- CURVEDRAW CLASS DEFINITIONS
-*/
-
-CurveDraw::CurveDraw() : drawMode(false) {}
-
-CurveDraw::~CurveDraw() {}
-
-bool CurveDraw::isDrawing() const { return drawMode; }
-
-QVector<vcg::Point3<PMesh::ScalarType>> CurveDraw::getPoints() const {
-    return addedPoints;
-}
-
-void CurveDraw::startDraw() {
-    reset();
-    drawMode = true;
-}
-
-void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
-                         PMesh::FacePointer face) {
-    if (drawMode) {
-        addedPoints.push_back(point);
-        faces.push_back(face);
-    }
-}
-
-void CurveDraw::reset() {
-    addedPoints.clear();
-    faces.clear();
-}
-
-void CurveDraw::endDraw() { drawMode = false; }
-
-qgl::Vec CurveDraw::getMousePosition3D(const qglviewer::Camera *cam,
-                                       const QPoint &ip) {
-    qglviewer::Vec point(ip.x(), ip.y(), 0.5);
-    point = cam->unprojectedCoordinatesOf(point);
-    qglviewer::Vec dir = point - cam->position();
-    dir.normalize();
-    // parameter of the plane where we are goint to project
-    // see
-    // http://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
-    qglviewer::Vec normalPlane = cam->viewDirection();
-    qreal nl = normalPlane * dir;
-    assert(nl > 1e-8);
-    qglviewer::Vec l0 = cam->position();
-    //        qglviewer::Vec p0 = l0 + 0.5 * normalPlane;
-    qglviewer::Vec p0 = l0 + normalPlane;
-    qglviewer::Vec p0l0 = p0 - l0;
-    qreal distance = p0l0 * normalPlane / nl;
-    dir = distance * dir;
-    qglviewer::Vec pos = l0 + dir;
-
-    return pos;
-}
-
-/*
  VIEWER CLASS DEFINITIONS
 */
 
@@ -128,10 +71,9 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
 
     //    qDebug() <<
 
-    auto position =
-        qtToVCG(CurveDraw::getMousePosition3D(this->camera(), e->pos()));
+    auto position = getMousePosition3D(this->camera(), e->pos());
 
-    qDebug() << "Position 3D: " << vcgToQT(position);
+    qDebug() << "Position 3D: " << position;
 
     this->camera()->position();
 
@@ -152,13 +94,15 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
     //                                 face)) {
     if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
 
-        if (drawer.getSize() < 3) {
+        auto drawer = app.getDrawer();
 
-            if (!drawer.isDrawing()) {
-                drawer.startDraw();
+        if (drawer->getSize() < 3) {
+
+            if (!drawer->isDrawing()) {
+                drawer->startDraw();
             }
 
-            drawer.addPoint(hitPoint, face);
+            drawer->addPoint(hitPoint, face);
         }
 
         //        qDebug() << "HIT: " << vcgToQT(hitPoint) << " :D";
@@ -167,7 +111,7 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
 
         //        qDebug() << "FACE: " << face;
 
-        qDebug() << drawer.getPoints();
+        qDebug() << drawer->getPoints();
     } else {
         qDebug() << ":(";
         //        QGLViewer::mousePressEvent(e);

@@ -45,7 +45,8 @@ SOURCES += \
     application.cpp \
     utils/standardCamera.cpp \
     viewer.cpp \
-    utils/intersection.cpp
+    utils/intersection.cpp \
+    curvedraw.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -56,7 +57,8 @@ HEADERS += \
     utils/standardCamera.h \
     utils/qutils.h\
     utils/object.h \
-    utils/intersection.h
+    utils/intersection.h \
+    curvedraw.h
 
 FORMS += \
         mainwindow.ui
