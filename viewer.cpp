@@ -3,6 +3,7 @@
 
 #include "QGLViewer/manipulatedFrame.h"
 
+#include "utils/intersection.h"
 #include "utils/qutils.h"
 #include "vcg/complex/algorithms/intersection.h"
 
@@ -135,15 +136,18 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
     //    qDebug() << orig;
     //    qDebug() << dir;
 
-    Point3<CMesh::ScalarType> hitPoint;
-    Line3<CMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
+    vcg::Point3<PMesh::ScalarType> hitPoint;
+    vcg::Line3<PMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
 
     PMesh::ScalarType b1, b2, b3;
     PMesh::FacePointer face = nullptr;
 
-    if (vcg::IntersectionRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3,
-                                 face)) {
+    //    if (vcg::IntersectionRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3,
+    //                                 face)) {
+    if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
         qDebug() << "HIT: " << vcgToQT(hitPoint) << " :D";
+
+        qDebug() << "B1,2,3: " << b1 << ", " << b1 << ", " << b3;
 
         qDebug() << "FACE: " << face;
     } else {

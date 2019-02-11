@@ -44,7 +44,8 @@ SOURCES += \
     mainwindow.cpp \
     application.cpp \
     utils/standardCamera.cpp \
-    viewer.cpp
+    viewer.cpp \
+    utils/intersection.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -54,7 +55,8 @@ HEADERS += \
     utils/utils.h \
     utils/standardCamera.h \
     utils/qutils.h\
-    utils/object.h
+    utils/object.h \
+    utils/intersection.h
 
 FORMS += \
         mainwindow.ui
