@@ -7,12 +7,22 @@
 #include <utils/utils.h>
 
 class Application {
+
+    struct CurrentState {
+        bool drawVisible;
+        bool meshVisible;
+
+        CurrentState();
+    };
+
   public:
     Application();
 
     virtual ~Application();
 
     Status loadMesh(std::string filename);
+    Status showMesh();
+    Status hideMesh();
 
     PMesh *getMesh();
 
@@ -20,6 +30,8 @@ class Application {
 
   private:
     PMesh mesh;
+
+    CurrentState state;
 };
 
 #endif // APPLICATION_H

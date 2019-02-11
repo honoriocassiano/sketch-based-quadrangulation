@@ -28,6 +28,22 @@ Status Application::loadMesh(std::string filename) {
     }
 }
 
+Status Application::showMesh() {
+    if (mesh.VertexNumber() > 0) {
+        state.meshVisible = true;
+
+        return STATUS_OK;
+    }
+
+    return Status::make(false, "Cannot display an empty mesh!");
+}
+
+Status Application::hideMesh() {
+    state.meshVisible = false;
+
+    return STATUS_OK;
+}
+
 PMesh *Application::getMesh() { return &mesh; }
 
 void Application::drawMesh() const {
@@ -98,4 +114,9 @@ void Application::drawMesh() const {
     //    glEnd();
 
     glPopMatrix();
+}
+
+Application::CurrentState::CurrentState() {
+    drawVisible = false;
+    meshVisible = false;
 }
