@@ -61,61 +61,40 @@ void Viewer::init() {
     //    glEnable(GL_COLOR_MATERIAL);
     //    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
+
+    glPolygonOffset(1, 1);
 }
 
-// void Viewer::update() { draw(); }
-
 void Viewer::mousePressEvent(QMouseEvent *e) {
-    // Start selection. Mode is ADD with Shift key and TOGGLE with Alt key.
 
-    //    drawer.startDraw();
+    if (e->button() == Qt::MouseButton::LeftButton) {
 
-    //    qDebug() <<
+        qgl::Vec orig, dir;
 
-    auto position = getMousePosition3D(this->camera(), e->pos());
+        this->camera()->convertClickToLine(e->pos(), orig, dir);
 
-    qDebug() << "Position 3D: " << position;
+        vcg::Point3<PMesh::ScalarType> hitPoint;
+        vcg::Line3<PMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
 
-    this->camera()->position();
+        PMesh::ScalarType b1, b2, b3;
+        PMesh::FacePointer face = nullptr;
 
-    qgl::Vec orig, dir;
+        if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
 
-    this->camera()->convertClickToLine(e->pos(), orig, dir);
-
-    //    qDebug() << orig;
-    //    qDebug() << dir;
-
-    vcg::Point3<PMesh::ScalarType> hitPoint;
-    vcg::Line3<PMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
-
-    PMesh::ScalarType b1, b2, b3;
-    PMesh::FacePointer face = nullptr;
-
-    //    if (vcg::IntersectionRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3,
-    //                                 face)) {
-    if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
-
-        auto drawer = app.getDrawer();
-
-        if (drawer->getSize() < 3) {
+            auto drawer = app.getDrawer();
 
             if (!drawer->isDrawing()) {
                 drawer->startDraw();
             }
 
             drawer->addPoint(hitPoint, face);
+
+            qDebug() << "Points: " << drawer->getPoints();
+        } else {
+            //        qDebug() << ":(";
         }
-
-        //        qDebug() << "HIT: " << vcgToQT(hitPoint) << " :D";
-
-        //        qDebug() << "B1,2,3: " << b1 << ", " << b1 << ", " << b3;
-
-        //        qDebug() << "FACE: " << face;
-
-        qDebug() << drawer->getPoints();
-    } else {
-        qDebug() << ":(";
-        //        QGLViewer::mousePressEvent(e);
+    } else if (e->button() == Qt::MouseButton::RightButton) {
+        app.getDrawer()->endDraw();
     }
 
     QGLViewer::mousePressEvent(e);
@@ -143,13 +122,18 @@ void Viewer::mouseMoveEvent(QMouseEvent *e) {
 }
 
 void Viewer::keyPressEvent(QKeyEvent *e) {
+
+    Status st;
+
     if (e->key() == Qt::Key::Key_M) {
+        st = app.switchShowingMesh();
 
-        auto st = app.switchShowingMesh();
+    } else if (e->key() == Qt::Key::Key_D) {
+        st = app.switchShowingDrawing();
+    }
 
-        if (!st.result) {
-            emit notifyStatusBar(QString::fromStdString(st.message));
-        }
+    if (!st.result) {
+        emit notifyStatusBar(QString::fromStdString(st.message));
     }
 
     update();

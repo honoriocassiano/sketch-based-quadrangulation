@@ -56,6 +56,10 @@ void Application::draw() const {
     glPushMatrix();
     if (state.meshVisible) {
 
+        glEnable(GL_POLYGON_OFFSET_FILL);
+
+        glColor3f(1, 1, 1);
+
         for (auto it = mesh.face.begin(); it != mesh.face.end(); ++it) {
             //    for (auto it = mesh.vert.begin(); it != mesh.vert.end(); ++it)
             //    {
@@ -68,8 +72,46 @@ void Application::draw() const {
 
             glEnd();
         }
+
+        glDisable(GL_POLYGON_OFFSET_FILL);
+    }
+
+    if (state.drawVisible) {
+
+        glColor3f(1, 0, 0);
+
+        glBegin(GL_LINE_STRIP);
+
+        for (const auto &p : drawer.getPoints()) {
+            vcg::glVertex(p);
+        }
+
+        glEnd();
     }
     glPopMatrix();
+}
+
+Status Application::showDrawing() {
+    if (drawer.getSize() > 0) {
+        state.drawVisible = true;
+
+        return STATUS_OK;
+    }
+
+    return Status::make(false, "No drawing to show!");
+}
+
+Status Application::switchShowingDrawing() {
+    if (state.drawVisible) {
+        return hideDrawing();
+    }
+
+    return showDrawing();
+}
+
+Status Application::hideDrawing() {
+    state.drawVisible = false;
+    return STATUS_OK;
 }
 
 Application::CurrentState::CurrentState() {

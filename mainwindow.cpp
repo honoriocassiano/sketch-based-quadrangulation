@@ -13,6 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->loadMeshButton, SIGNAL(clicked()), this, SLOT(loadMesh()));
 
+    connect(ui->viewer, SIGNAL(notifyStatusBar(QString)), ui->statusBar,
+            SLOT(showMessage(QString)));
+
     connect(this, SIGNAL(notifyStatusBar(QString)), ui->statusBar,
             SLOT(showMessage(QString)));
 }
@@ -29,12 +32,16 @@ void MainWindow::loadMesh() {
 
     //    QString fileName = "../models/3holes_quad.obj";
     //    QString fileName = "../models/cube.obj";
-    //    QString fileName = "../models/cube_tri.obj";
-    QString fileName = "../models/magnolia.obj";
+    QString fileName = "../models/cube_tri.obj";
+    //    QString fileName = "../models/magnolia.obj";
 
     if (!fileName.isEmpty()) {
         //        qDebug() << fileName;
         Status status = ui->viewer->loadMesh(fileName);
+
+        //        ui->viewer->setFocus();
+
+        ui->viewer->setFocus();
 
         emit notifyStatusBar(QString::fromStdString(status.message));
     }

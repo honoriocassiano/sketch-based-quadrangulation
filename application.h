@@ -47,6 +47,11 @@ class Application {
 
     inline PMesh *getMesh() { return &mesh; }
 
+    Status showDrawing();
+    Status switchShowingDrawing();
+    Status hideDrawing();
+    inline bool isShowingDrawing() const { return state.meshVisible; }
+
     inline CurveDraw *getDrawer() { return &drawer; }
 
     /*!
