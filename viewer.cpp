@@ -87,9 +87,16 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
                 drawer->startDraw();
             }
 
-            drawer->addPoint(hitPoint, face);
+            float matrix[16];
 
-            qDebug() << "Points: " << drawer->getPoints();
+            camera()->getModelViewProjectionMatrix(matrix);
+
+            drawer->addPoint(hitPoint, face, qtToVCG(camera()->viewDirection()),
+                             matrix);
+
+            app.showDrawing();
+
+            //            qDebug() << "Points: " << drawer->getPoints();
         } else {
             //        qDebug() << ":(";
         }

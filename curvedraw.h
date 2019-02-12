@@ -25,6 +25,8 @@ class CurveDraw {
      */
     std::vector<vcg::Point3<PMesh::ScalarType>> getPoints() const;
 
+    void draw() const;
+
     /*!
      * \brief Start draw mode after calls CurveDraw::reset()
      * \param firstPoint first point to add to drawing
@@ -37,10 +39,13 @@ class CurveDraw {
      * \brief Add a point to drawing. If drawing mode is not active, the point
      * is ignored
      * \param point point to add
+     * \param viewDir view direction of camera
      * \param face face that contains the point
      */
     void addPoint(const vcg::Point3<PMesh::ScalarType> &point,
-                  PMesh::FacePointer face);
+                  PMesh::FacePointer face,
+                  const vcg::Point3<PMesh::ScalarType> &viewDir,
+                  float viewProjectionMatrix[16]);
 
     /*!
      * \brief Deactivate drawing mode
@@ -62,6 +67,8 @@ class CurveDraw {
   private:
     bool drawMode;
     std::vector<PMesh::FacePointer> faces;
+    std::vector<std::size_t> pointsMap;
+    std::vector<vcg::Point3<PMesh::ScalarType>> curvePoints;
     std::vector<vcg::Point3<PMesh::ScalarType>> addedPoints;
 };
 

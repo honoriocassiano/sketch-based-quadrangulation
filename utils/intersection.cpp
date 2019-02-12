@@ -16,8 +16,9 @@ bool intersectRayMesh(
     typename PMesh::FaceIterator fi;
     bool hit = false;
 
-    if (m == 0)
+    if (m == nullptr) {
         return false;
+    }
 
     // TriMeshType::FaceIterator fi;
     // std::vector<TriMeshType::FaceType*>::iterator fi;

@@ -1,6 +1,21 @@
 #include "curvedraw.h"
+#include "utils/glutils.h"
+#include "vcg/simplex/face/pos.h"
+#include "vcg/space/intersection2.h"
+#include "wrap/gl/space.h"
+
+// TODO Remove these includes
+#include "qdebug.h"
+#include "utils/qutils.h"
 
 namespace qgl = qglviewer;
+
+#define CROSS(dest, v1, v2)                                                    \
+    {                                                                          \
+        dest[0] = v1[1] * v2[2] - v1[2] * v2[1];                               \
+        dest[1] = v1[2] * v2[0] - v1[0] * v2[2];                               \
+        dest[2] = v1[0] * v2[1] - v1[1] * v2[0];                               \
+    }
 
 /*
  CURVEDRAW CLASS DEFINITIONS
@@ -16,22 +31,318 @@ std::vector<vcg::Point3<PMesh::ScalarType>> CurveDraw::getPoints() const {
     return addedPoints;
 }
 
+void CurveDraw::draw() const {
+    glColor3f(1, 0, 0);
+
+    glBegin(GL_LINE_STRIP);
+
+    for (const auto &p : curvePoints) {
+        vcg::glVertex(p);
+    }
+
+    glEnd();
+}
+
 void CurveDraw::startDraw() {
     reset();
     drawMode = true;
 }
 
 void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
-                         PMesh::FacePointer face) {
+                         PMesh::FacePointer face,
+                         const vcg::Point3<PMesh::ScalarType> &viewDir,
+                         float mvpMatrix[16]) {
+
     if (drawMode) {
-        addedPoints.push_back(point);
-        faces.push_back(face);
+
+        //        qDebug() << "PROJECTED: " << vcg::Point3<PMesh::ScalarType>(x,
+        //        y, z);
+        auto pathExists = true;
+
+        if (faces.empty() || face == faces.back()) {
+            pointsMap.push_back(curvePoints.size());
+
+            curvePoints.push_back(point);
+        } else {
+
+            std::vector<vcg::Point3<PMesh::ScalarType>> temp;
+
+            //            float wp = viewProjectionMatrix[3] * point.X() +
+            //                       viewProjectionMatrix[7] * point.Y() +
+            //                       viewProjectionMatrix[11] * point.Z() +
+            //                       viewProjectionMatrix[15];
+
+            //            /// Get the transformed points
+            //            float x = (viewProjectionMatrix[0] * point.X() +
+            //                       viewProjectionMatrix[4] * point.Y() +
+            //                       viewProjectionMatrix[8] * point.Z() +
+            //                       viewProjectionMatrix[12]) /
+            //                      wp;
+            //            float y = (viewProjectionMatrix[1] * point.X() +
+            //                       viewProjectionMatrix[5] * point.Y() +
+            //                       viewProjectionMatrix[9] * point.Z() +
+            //                       viewProjectionMatrix[13]) /
+            //                      wp;
+            //            float z = (viewProjectionMatrix[2] * point.X() +
+            //                       viewProjectionMatrix[6] * point.Y() +
+            //                       viewProjectionMatrix[10] * point.Z() +
+            //                       viewProjectionMatrix[14]) /
+            //                      wp;
+
+            auto firstFace = faces.back();
+            auto currentFace = firstFace;
+
+            auto pStartPoint = getProjectedPoint(addedPoints.back(), mvpMatrix);
+            auto pEndPoint = getProjectedPoint(point, mvpMatrix);
+
+            auto lastEdge = -1;
+
+            // Find the first edge
+            {
+                /// Projected points
+                auto projV0 =
+                    getProjectedPoint(currentFace->V(0)->P(), mvpMatrix);
+                auto projV1 =
+                    getProjectedPoint(currentFace->V(1)->P(), mvpMatrix);
+                auto projV2 =
+                    getProjectedPoint(currentFace->V(2)->P(), mvpMatrix);
+
+                /// Projected drawed segment
+                auto projSegment =
+                    vcg::Segment2<PMesh::ScalarType>(pStartPoint, pEndPoint);
+
+                /// Projected intersection point to check on 2D orthogonal to
+                /// viewDir
+                vcg::Point2<PMesh::ScalarType> projIntersection;
+
+                /// Projected intersection point to check on 3D
+                vcg::Point3<PMesh::ScalarType> intersection;
+
+                /// Edge points on 3D space
+                vcg::Point3<PMesh::ScalarType> edgePoint1;
+                vcg::Point3<PMesh::ScalarType> edgePoint2;
+
+                /// Projected edges
+                auto projSeg01 =
+                    vcg::Segment2<PMesh::ScalarType>(projV0, projV1);
+                auto projSeg12 =
+                    vcg::Segment2<PMesh::ScalarType>(projV1, projV2);
+                //                auto pSeg20 =
+                //                vcg::Segment2<PMesh::ScalarType>(pv2, pv0);
+
+                /// Check the intersection on 2D plane
+                if (vcg::SegmentSegmentIntersection(projSegment, projSeg01,
+                                                    projIntersection)) {
+                    lastEdge = 0;
+
+                    edgePoint1 = currentFace->V(0)->P();
+                    edgePoint2 = currentFace->V(1)->P();
+
+                } else if (vcg::SegmentSegmentIntersection(
+                               projSegment, projSeg12, projIntersection)) {
+                    lastEdge = 1;
+
+                    edgePoint1 = currentFace->V(1)->P();
+                    edgePoint2 = currentFace->V(2)->P();
+                } else {
+                    lastEdge = 2;
+
+                    edgePoint1 = currentFace->V(2)->P();
+                    edgePoint2 = currentFace->V(0)->P();
+                }
+
+                /// Get the intersection point on 3D space
+
+                /// Plane that cut the face. That plane passes through drawed
+                /// vertices with direction=viewDir
+                vcg::Plane3<PMesh::ScalarType> plane;
+
+                /// Normal to the plane
+                vcg::Point3<PMesh::ScalarType> normal;
+
+                /// Line formed by the edge
+                vcg::Line3<PMesh::ScalarType> edgeLine(
+                    edgePoint1, (edgePoint2 - edgePoint1));
+
+                CROSS(normal, viewDir, (addedPoints.back() - point));
+
+                plane.Init(point, normal);
+
+                /// Calculate the intersection point on 3D space
+                vcg::IntersectionPlaneLine(plane, edgeLine, intersection);
+
+                /// Add point to possible curve points
+                temp.push_back(intersection);
+            }
+
+            auto pos = vcg::face::Pos<PMesh::FaceType>(currentFace, lastEdge);
+
+            /// Flip to adjacent face
+            pos.FlipF();
+
+            /// Get new face and the edge index on this face
+            currentFace = pos.F();
+            lastEdge = pos.E();
+
+            auto projLine = vcg::Line2<PMesh::ScalarType>(
+                pStartPoint, pEndPoint - pStartPoint);
+
+            while (currentFace != face) {
+
+                if (currentFace == nullptr) {
+                    // TODO Add status return
+                    pathExists = false;
+                    break;
+                }
+
+                char nextEdge;
+
+                //******************************************************
+                auto projV0 =
+                    getProjectedPoint(currentFace->V(0)->P(), mvpMatrix);
+                auto projV1 =
+                    getProjectedPoint(currentFace->V(1)->P(), mvpMatrix);
+                auto projV2 =
+                    getProjectedPoint(currentFace->V(2)->P(), mvpMatrix);
+
+                /// Projected drawed segment
+                //                auto projSegment =
+                //                    vcg::Segment2<PMesh::ScalarType>(pStartPoint,
+                //                    pEndPoint);
+
+                /// Projected intersection point to check on 2D orthogonal to
+                /// viewDir
+                vcg::Point2<PMesh::ScalarType> projIntersection;
+
+                /// Projected intersection point to check on 3D
+                vcg::Point3<PMesh::ScalarType> intersection;
+
+                /// Edge points on 3D space
+                vcg::Point3<PMesh::ScalarType> edgePoint1;
+                vcg::Point3<PMesh::ScalarType> edgePoint2;
+
+                /// Projected edges
+                vcg::Segment2<PMesh::ScalarType> projEdge;
+                //                vcg::Segment2<PMesh::ScalarType> projSeg2;
+
+                /// TODO Refactor this (shit) code
+                if (lastEdge == 0) {
+                    projEdge.Set(projV1, projV2);
+
+                    if (vcg::LineSegmentIntersection(projLine, projEdge,
+                                                     projIntersection)) {
+                        nextEdge = 1;
+
+                        edgePoint1 = currentFace->V(1)->P();
+                        edgePoint2 = currentFace->V(2)->P();
+
+                    } else {
+                        nextEdge = 2;
+
+                        edgePoint1 = currentFace->V(2)->P();
+                        edgePoint2 = currentFace->V(0)->P();
+                    }
+
+                } else if (lastEdge == 1) {
+                    projEdge.Set(projV2, projV0);
+
+                    if (vcg::LineSegmentIntersection(projLine, projEdge,
+                                                     projIntersection)) {
+                        nextEdge = 2;
+
+                        edgePoint1 = currentFace->V(2)->P();
+                        edgePoint2 = currentFace->V(0)->P();
+
+                    } else {
+                        nextEdge = 0;
+
+                        edgePoint1 = currentFace->V(0)->P();
+                        edgePoint2 = currentFace->V(1)->P();
+                    }
+
+                } else {
+                    projEdge.Set(projV0, projV1);
+
+                    if (vcg::LineSegmentIntersection(projLine, projEdge,
+                                                     projIntersection)) {
+                        nextEdge = 0;
+
+                        edgePoint1 = currentFace->V(0)->P();
+                        edgePoint2 = currentFace->V(1)->P();
+
+                    } else {
+                        nextEdge = 1;
+
+                        edgePoint1 = currentFace->V(1)->P();
+                        edgePoint2 = currentFace->V(2)->P();
+                    }
+                }
+
+                /// Get the intersection point on 3D space
+
+                /// Plane that cut the face. That plane passes through drawed
+                /// vertices with direction=viewDir
+                vcg::Plane3<PMesh::ScalarType> plane;
+
+                /// Normal to the plane
+                vcg::Point3<PMesh::ScalarType> normal;
+
+                /// Line formed by the edge
+                vcg::Line3<PMesh::ScalarType> edgeLine(
+                    edgePoint1, (edgePoint2 - edgePoint1));
+
+                CROSS(normal, viewDir, (addedPoints.back() - point));
+
+                plane.Init(point, normal);
+
+                /// Calculate the intersection point on 3D space
+                vcg::IntersectionPlaneLine(plane, edgeLine, intersection);
+
+                /// Add point to possible curve points
+                temp.push_back(intersection);
+                //******************************************************
+
+                //                auto pv1 =
+                //                getProjectedPoint(currentFace->V(0)->P(),
+                //                mvpMatrix);
+                //                auto pv2 =
+                //                getProjectedPoint(currentFace->V(1)->P(),
+                //                mvpMatrix);
+                //                auto pv3 =
+                //                getProjectedPoint(currentFace->V(2)->P(),
+                //                mvpMatrix);
+
+                //                if () {
+                //                }
+
+                // TODO HERE!!!
+            }
+
+            if (pathExists) {
+
+                temp.push_back(point);
+
+                curvePoints.reserve(curvePoints.size() + temp.size());
+                curvePoints.insert(curvePoints.end(), temp.begin(), temp.end());
+
+                pointsMap.push_back(curvePoints.size() - 1);
+            }
+        }
+
+        if (pathExists) {
+
+            addedPoints.push_back(point);
+            faces.push_back(face);
+        }
     }
 }
 
 void CurveDraw::reset() {
     addedPoints.clear();
+    curvePoints.clear();
     faces.clear();
 }
 
 void CurveDraw::endDraw() { drawMode = false; }
+
+#undef CROSS

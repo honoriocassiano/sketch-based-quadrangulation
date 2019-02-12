@@ -2,6 +2,7 @@
 
 #include "qdebug.h"
 
+#include "vcg/complex/algorithms/update/topology.h"
 #include <GL/gl.h>
 #include <wrap/gl/space.h>
 #include <wrap/io_trimesh/import.h>
@@ -13,6 +14,9 @@ Application::~Application() {}
 Status Application::loadMesh(std::string filename) {
     mesh.Clear();
     int err = vcg::tri::io::Importer<PMesh>::Open(mesh, filename.c_str());
+
+    /// Update face-face topology
+    vcg::tri::UpdateTopology<PMesh>::FaceFace(mesh);
 
     if (!err) {
         qDebug() << "NO ERROR! " << mesh.face.size();
@@ -78,15 +82,7 @@ void Application::draw() const {
 
     if (state.drawVisible) {
 
-        glColor3f(1, 0, 0);
-
-        glBegin(GL_LINE_STRIP);
-
-        for (const auto &p : drawer.getPoints()) {
-            vcg::glVertex(p);
-        }
-
-        glEnd();
+        drawer.draw();
     }
     glPopMatrix();
 }
