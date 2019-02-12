@@ -23,6 +23,7 @@ bool intersectRayMesh(
     // TriMeshType::FaceIterator fi;
     // std::vector<TriMeshType::FaceType*>::iterator fi;
 
+    ScalarType lastDist = INFINITY;
     ScalarType dist;
     vcg::Point3<ScalarType> p1;
     vcg::Point3<ScalarType> p2;
@@ -38,9 +39,12 @@ bool intersectRayMesh(
         if (vcg::IntersectionLineTriangle<ScalarType>(ray, p1, p2, p3, dist,
                                                       bar1, bar2)) {
             bar3 = (1 - bar1 - bar2);
-            hitPoint = p1 * bar3 + p2 * bar1 + p3 * bar2;
-            fp = &(*fi);
-            hit = true;
+
+            if (dist < lastDist) {
+                hitPoint = p1 * bar3 + p2 * bar1 + p3 * bar2;
+                fp = &(*fi);
+                hit = true;
+            }
         }
     }
 
