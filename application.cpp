@@ -70,6 +70,7 @@ void Application::draw() const {
             //        vcg::glVertex(it->P());
             glBegin(GL_POLYGON);
 
+            vcg::glNormal(it->cN());
             for (int j = 0; j < it->VN(); j++) {
                 vcg::glVertex(it->V(j)->P());
             }
