@@ -95,16 +95,12 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
                              matrix);
 
             app.showDrawing();
-
-            //            qDebug() << "Points: " << drawer->getPoints();
         } else {
-            //        qDebug() << ":(";
+            QGLViewer::mousePressEvent(e);
         }
     } else if (e->button() == Qt::MouseButton::RightButton) {
         app.getDrawer()->endDraw();
     }
-
-    QGLViewer::mousePressEvent(e);
 }
 
 void Viewer::mouseMoveEvent(QMouseEvent *e) {
