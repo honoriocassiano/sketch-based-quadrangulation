@@ -171,6 +171,8 @@ void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
                     break;
                 }
 
+                qDebug() << "Face: " << currentFace;
+
                 int nextEdge;
 
                 /// Projected intersection point to check on 2D orthogonal to
@@ -231,6 +233,16 @@ void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
 
                 /// Add point to possible curve points
                 temp.push_back(intersection);
+
+                /// New Pos
+                pos = vcg::face::Pos<PMesh::FaceType>(currentFace, nextEdge);
+
+                /// Flip to adjacent face
+                pos.FlipF();
+
+                /// Get new face and the edge index on this face
+                currentFace = pos.F();
+                lastEdge = pos.E();
             }
 
             if (pathExists) {
