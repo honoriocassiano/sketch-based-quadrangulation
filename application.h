@@ -50,7 +50,7 @@ class Application {
     Status showDrawing();
     Status switchShowingDrawing();
     Status hideDrawing();
-    inline bool isShowingDrawing() const { return state.meshVisible; }
+    inline bool isShowingDrawing() const { return state.drawVisible; }
 
     inline CurveDraw *getDrawer() { return &drawer; }
 

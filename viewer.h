@@ -9,6 +9,17 @@
 
 class Viewer : public QGLViewer {
     Q_OBJECT
+
+  private:
+    struct LastState {
+        QPoint windowPosition;
+        PMesh::FacePointer hitFace;
+        vcg::Point3<PMesh::ScalarType> hitPoint;
+        //        bool valid;
+
+        //        LastState() : valid(false) {}
+    };
+
   public:
     explicit Viewer(QWidget *parent = nullptr);
     ~Viewer() override;
@@ -37,6 +48,11 @@ class Viewer : public QGLViewer {
 
   private:
     Application app;
+
+    LastState lastState;
+
+    //    PMesh::FacePointer lastFace;
+    //    vcg::Point3<PMesh::ScalarType> lastHitPoint;
 };
 
 #endif // VIEWER_H

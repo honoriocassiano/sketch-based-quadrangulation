@@ -19,14 +19,8 @@ Status Application::loadMesh(std::string filename) {
     vcg::tri::UpdateTopology<PMesh>::FaceFace(mesh);
 
     if (!err) {
-        qDebug() << "NO ERROR! " << mesh.face.size();
-
         return STATUS_OK;
     } else {
-        qDebug() << "ERROR!";
-
-        qDebug() << vcg::tri::io::Importer<PMesh>::ErrorMsg(err);
-
         return Status::make(false,
                             vcg::tri::io::Importer<PMesh>::ErrorMsg(err));
     }

@@ -80,47 +80,76 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
         PMesh::FacePointer face = nullptr;
 
         if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
-
-            auto drawer = app.getDrawer();
-
-            if (!drawer->isDrawing()) {
-                drawer->startDraw();
-            }
-
-            float matrix[16];
-
-            camera()->getModelViewProjectionMatrix(matrix);
-
-            drawer->addPoint(hitPoint, face, qtToVCG(camera()->viewDirection()),
-                             matrix);
-
-            app.showDrawing();
+            lastState.windowPosition = e->pos();
+            lastState.hitFace = face;
+            lastState.hitPoint = hitPoint;
+            //            lastState.valid = true;
         } else {
             QGLViewer::mousePressEvent(e);
         }
     } else if (e->button() == Qt::MouseButton::RightButton) {
         app.getDrawer()->endDraw();
+
+        //        lastState.valid = false;
     }
 }
 
 void Viewer::mouseMoveEvent(QMouseEvent *e) {
-    /*if (modeTemporal == InputCurve) {
-         if (!painter.isDrawing)
-             return;
-         painter.CurrentPoint =
-             painter.mousePosition3D(this->camera(), e->pos());
-         painter.points.push_back(painter.CurrentPoint);
-         painter.addSegmentStroke(painter.LastPoint, painter.CurrentPoint);
-         painter.LastPoint = painter.CurrentPoint;
-         // cout<<"added "<<painter.CurrentPoint.x<<"
-         // "<<painter.CurrentPoint.y<<" "<<painter.CurrentPoint.z<<endl;
-         // tri::Clean<CMesh>::RemoveDuplicateVertex(painter.LineStroke);
-         // tri::Clean<CMesh>::RemoveUnreferencedVertex(painter.LineStroke);
-         // tri::Allocator<CMesh>::CompactEveryVector(painter.LineStroke);
-         update();
-     } else {
-         QGLViewer::mouseMoveEvent(e);
-     }*/
+
+    if (e->buttons() == Qt::MouseButton::LeftButton) {
+
+        //        qDebug() << e->pos();
+
+        qgl::Vec orig, dir;
+
+        this->camera()->convertClickToLine(e->pos(), orig, dir);
+
+        vcg::Point3<PMesh::ScalarType> hitPoint;
+        vcg::Line3<PMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
+
+        PMesh::ScalarType b1, b2, b3;
+        PMesh::FacePointer face = nullptr;
+
+        if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
+
+            if (max(abs(e->pos().x() - lastState.windowPosition.x()),
+                    abs(e->pos().y() - lastState.windowPosition.y())) > 5) {
+
+                auto drawer = app.getDrawer();
+
+                if (!drawer->isDrawing()) {
+                    drawer->startDraw();
+                }
+
+                float matrix[16];
+
+                camera()->getModelViewProjectionMatrix(matrix);
+
+                if (!drawer->isDrawing()) {
+
+                    drawer->addPoint(lastState.hitPoint, lastState.hitFace,
+                                     qtToVCG(camera()->viewDirection()),
+                                     matrix);
+                }
+
+                drawer->addPoint(hitPoint, face,
+                                 qtToVCG(camera()->viewDirection()), matrix);
+
+                if (!app.isShowingDrawing()) {
+                    app.showDrawing();
+                }
+
+                lastState.windowPosition = e->pos();
+                lastState.hitFace = face;
+                lastState.hitPoint = hitPoint;
+
+                update();
+
+                return;
+            }
+        }
+    }
+
     QGLViewer::mouseMoveEvent(e);
 }
 
