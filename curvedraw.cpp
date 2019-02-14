@@ -32,8 +32,11 @@ std::vector<vcg::Point3<PMesh::ScalarType>> CurveDraw::getPoints() const {
 }
 
 void CurveDraw::draw() const {
-    glColor3f(1, 0, 0);
+    glDisable(GL_LIGHTING);
 
+    glColor3f(0, 0, 0);
+
+    glLineWidth(2.5);
     glBegin(GL_LINE_STRIP);
 
     for (const auto &p : curvePoints) {
@@ -41,6 +44,8 @@ void CurveDraw::draw() const {
     }
 
     glEnd();
+
+    glEnable(GL_LIGHTING);
 }
 
 void CurveDraw::startDraw() {
