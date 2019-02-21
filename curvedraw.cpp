@@ -37,7 +37,12 @@ void CurveDraw::draw() const {
     glColor3f(0, 0, 0);
 
     glLineWidth(2.5);
-    glBegin(GL_LINE_STRIP);
+
+    if (loop) {
+        glBegin(GL_LINE_LOOP);
+    } else {
+        glBegin(GL_LINE_STRIP);
+    }
 
     for (const auto &p : curvePoints) {
         vcg::glVertex(p);
@@ -50,6 +55,7 @@ void CurveDraw::draw() const {
 
 void CurveDraw::startDraw() {
     reset();
+    loop = false;
     drawMode = true;
 }
 
@@ -275,6 +281,9 @@ void CurveDraw::reset() {
     faces.clear();
 }
 
-void CurveDraw::endDraw() { drawMode = false; }
+void CurveDraw::endDraw(bool _loop) {
+    drawMode = false;
+    loop = _loop;
+}
 
 #undef CROSS
