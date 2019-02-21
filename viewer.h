@@ -15,9 +15,9 @@ class Viewer : public QGLViewer {
         QPoint windowPosition;
         PMesh::FacePointer hitFace;
         vcg::Point3<PMesh::ScalarType> hitPoint;
-        //        bool valid;
+        bool valid;
 
-        //        LastState() : valid(false) {}
+        LastState() : valid(false) {}
     };
 
   public:

@@ -269,7 +269,6 @@ void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
         }
 
         if (pathExists && !lastPoint) {
-            //        if (pathExists) {
             addedPoints.push_back(point);
             faces.push_back(face);
         }

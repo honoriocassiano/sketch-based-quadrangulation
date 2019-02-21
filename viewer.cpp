@@ -68,6 +68,7 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
                 lastState.windowPosition = e->pos();
                 lastState.hitFace = face;
                 lastState.hitPoint = hitPoint;
+                lastState.valid = true;
             } else {
 
                 float matrix[16];
@@ -75,76 +76,80 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
 
                 app.getDrawer()->endDraw(qtToVCG(camera()->viewDirection()),
                                          matrix);
+
+                lastState.valid = false;
             }
 
-            //            lastState.valid = true;
-
         } else {
+            lastState.valid = false;
             QGLViewer::mousePressEvent(e);
         }
     } else {
-
+        lastState.valid = false;
         QGLViewer::mousePressEvent(e);
-
-        //        lastState.valid = false;
     }
 }
 
 void Viewer::mouseMoveEvent(QMouseEvent *e) {
 
-    if (e->buttons() == Qt::MouseButton::LeftButton) {
+    if (lastState.valid) {
+        if (e->buttons() == Qt::MouseButton::LeftButton) {
 
-        qgl::Vec orig, dir;
+            qgl::Vec orig, dir;
 
-        this->camera()->convertClickToLine(e->pos(), orig, dir);
+            this->camera()->convertClickToLine(e->pos(), orig, dir);
 
-        vcg::Point3<PMesh::ScalarType> hitPoint;
-        vcg::Line3<PMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
+            vcg::Point3<PMesh::ScalarType> hitPoint;
+            vcg::Line3<PMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
 
-        PMesh::ScalarType b1, b2, b3;
-        PMesh::FacePointer face = nullptr;
+            PMesh::ScalarType b1, b2, b3;
+            PMesh::FacePointer face = nullptr;
 
-        if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
+            if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3,
+                                 face)) {
 
-            if (max(abs(e->pos().x() - lastState.windowPosition.x()),
-                    abs(e->pos().y() - lastState.windowPosition.y())) > 5) {
+                if (max(abs(e->pos().x() - lastState.windowPosition.x()),
+                        abs(e->pos().y() - lastState.windowPosition.y())) > 5) {
 
-                auto drawer = app.getDrawer();
+                    auto drawer = app.getDrawer();
 
-                if (!drawer->isDrawing()) {
-                    drawer->startDraw();
-                }
+                    if (!drawer->isDrawing()) {
+                        drawer->startDraw();
+                    }
 
-                float matrix[16];
+                    float matrix[16];
 
-                camera()->getModelViewProjectionMatrix(matrix);
+                    camera()->getModelViewProjectionMatrix(matrix);
 
-                if (!drawer->isDrawing()) {
+                    if (!drawer->isDrawing()) {
 
-                    drawer->addPoint(lastState.hitPoint, lastState.hitFace,
+                        drawer->addPoint(lastState.hitPoint, lastState.hitFace,
+                                         qtToVCG(camera()->viewDirection()),
+                                         matrix);
+                    }
+
+                    drawer->addPoint(hitPoint, face,
                                      qtToVCG(camera()->viewDirection()),
                                      matrix);
+
+                    if (!app.isShowingDrawing()) {
+                        app.showDrawing();
+                    }
+
+                    lastState.windowPosition = e->pos();
+                    lastState.hitFace = face;
+                    lastState.hitPoint = hitPoint;
+
+                    update();
                 }
-
-                drawer->addPoint(hitPoint, face,
-                                 qtToVCG(camera()->viewDirection()), matrix);
-
-                if (!app.isShowingDrawing()) {
-                    app.showDrawing();
-                }
-
-                lastState.windowPosition = e->pos();
-                lastState.hitFace = face;
-                lastState.hitPoint = hitPoint;
-
-                update();
-
-                return;
             }
+        } else {
+            lastState.valid = false;
+            QGLViewer::mouseMoveEvent(e);
         }
+    } else {
+        QGLViewer::mouseMoveEvent(e);
     }
-
-    QGLViewer::mouseMoveEvent(e);
 }
 
 void Viewer::keyPressEvent(QKeyEvent *e) {
