@@ -67,7 +67,8 @@ void Viewer::init() {
 
 void Viewer::mousePressEvent(QMouseEvent *e) {
 
-    if (e->button() == Qt::MouseButton::LeftButton) {
+    if ((e->button() == Qt::MouseButton::LeftButton) ||
+        (e->button() == Qt::MouseButton::RightButton)) {
 
         qgl::Vec orig, dir;
 
@@ -80,15 +81,23 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
         PMesh::FacePointer face = nullptr;
 
         if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
-            lastState.windowPosition = e->pos();
-            lastState.hitFace = face;
-            lastState.hitPoint = hitPoint;
+
+            if (e->button() == Qt::MouseButton::LeftButton) {
+                lastState.windowPosition = e->pos();
+                lastState.hitFace = face;
+                lastState.hitPoint = hitPoint;
+            } else {
+                app.getDrawer()->endDraw();
+            }
+
             //            lastState.valid = true;
+
         } else {
             QGLViewer::mousePressEvent(e);
         }
-    } else if (e->button() == Qt::MouseButton::RightButton) {
-        app.getDrawer()->endDraw();
+    } else {
+
+        QGLViewer::mousePressEvent(e);
 
         //        lastState.valid = false;
     }
