@@ -69,7 +69,12 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
                 lastState.hitFace = face;
                 lastState.hitPoint = hitPoint;
             } else {
-                app.getDrawer()->endDraw();
+
+                float matrix[16];
+                camera()->getModelViewProjectionMatrix(matrix);
+
+                app.getDrawer()->endDraw(qtToVCG(camera()->viewDirection()),
+                                         matrix);
             }
 
             //            lastState.valid = true;

@@ -50,7 +50,8 @@ class CurveDraw {
     /*!
      * \brief Deactivate drawing mode
      */
-    void endDraw(bool loop = true);
+    void endDraw(const vcg::Point3<PMesh::ScalarType> &viewDir,
+                 float viewProjectionMatrix[16], bool loop = true);
 
     /*!
      * \brief Get the number of points added to draw
@@ -65,6 +66,11 @@ class CurveDraw {
     void reset();
 
   private:
+    void addPoint(const vcg::Point3<PMesh::ScalarType> &point,
+                  PMesh::FacePointer face,
+                  const vcg::Point3<PMesh::ScalarType> &viewDir,
+                  float viewProjectionMatrix[16], bool lastPoint);
+
     bool loop;
     bool drawMode;
     std::vector<PMesh::FacePointer> faces;

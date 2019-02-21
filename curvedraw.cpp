@@ -62,8 +62,7 @@ void CurveDraw::startDraw() {
 void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
                          PMesh::FacePointer face,
                          const vcg::Point3<PMesh::ScalarType> &viewDir,
-                         float mvpMatrix[16]) {
-
+                         float mvpMatrix[16], bool lastPoint) {
     if (drawMode) {
 
         //        qDebug() << "PROJECTED: " << vcg::Point3<PMesh::ScalarType>(x,
@@ -258,7 +257,9 @@ void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
 
             if (pathExists) {
 
-                temp.push_back(point);
+                if (!lastPoint) {
+                    temp.push_back(point);
+                }
 
                 curvePoints.reserve(curvePoints.size() + temp.size());
                 curvePoints.insert(curvePoints.end(), temp.begin(), temp.end());
@@ -267,12 +268,20 @@ void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
             }
         }
 
-        if (pathExists) {
-
+        if (pathExists && !lastPoint) {
+            //        if (pathExists) {
             addedPoints.push_back(point);
             faces.push_back(face);
         }
     }
+}
+
+void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
+                         PMesh::FacePointer face,
+                         const vcg::Point3<PMesh::ScalarType> &viewDir,
+                         float mvpMatrix[16]) {
+
+    addPoint(point, face, viewDir, mvpMatrix, false);
 }
 
 void CurveDraw::reset() {
@@ -281,7 +290,10 @@ void CurveDraw::reset() {
     faces.clear();
 }
 
-void CurveDraw::endDraw(bool _loop) {
+void CurveDraw::endDraw(const vcg::Point3<PMesh::ScalarType> &viewDir,
+                        float mvpMatrix[16], bool _loop) {
+    addPoint(curvePoints.front(), faces.front(), viewDir, mvpMatrix, true);
+
     drawMode = false;
     loop = _loop;
 }
