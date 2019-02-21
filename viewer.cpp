@@ -24,6 +24,11 @@ Viewer::Viewer(QWidget *parent) : QGLViewer(parent) {
     this->setCamera(sc);
 
     delete c;
+
+    // Set multisampling
+    auto currentFormat = format();
+    currentFormat.setSamples(4);
+    setFormat(currentFormat);
 }
 
 Viewer::~Viewer() {}
