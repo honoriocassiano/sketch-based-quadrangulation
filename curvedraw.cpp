@@ -285,6 +285,7 @@ void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
 
 void CurveDraw::reset() {
     addedPoints.clear();
+    pointsMap.clear();
     curvePoints.clear();
     faces.clear();
 }
