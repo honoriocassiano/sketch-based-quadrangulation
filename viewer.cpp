@@ -160,6 +160,9 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
     if (e->key() == Qt::Key::Key_M) {
         st = app.switchShowingMesh();
 
+    } else if (e->key() == Qt::Key::Key_R) {
+        app.getDrawer()->reset();
+
     } else if (e->key() == Qt::Key::Key_D) {
         st = app.switchShowingDrawing();
     }
