@@ -42,7 +42,7 @@ class CurveDraw {
      * \param viewDir view direction of camera
      * \param face face that contains the point
      */
-    void addPoint(const vcg::Point3<PMesh::ScalarType> &point,
+    void addPoint(PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &point,
                   PMesh::FacePointer face,
                   const vcg::Point3<PMesh::ScalarType> &viewDir,
                   float viewProjectionMatrix[16]);
@@ -50,7 +50,7 @@ class CurveDraw {
     /*!
      * \brief Deactivate drawing mode
      */
-    void endDraw(const vcg::Point3<PMesh::ScalarType> &viewDir,
+    void endDraw(PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &viewDir,
                  float viewProjectionMatrix[16], bool loop = true);
 
     /*!
@@ -66,15 +66,16 @@ class CurveDraw {
     void reset();
 
   private:
-    void addPoint(const vcg::Point3<PMesh::ScalarType> &point,
+    void addPoint(PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &point,
                   PMesh::FacePointer face,
                   const vcg::Point3<PMesh::ScalarType> &viewDir,
                   float viewProjectionMatrix[16], bool lastPoint);
 
     bool getCurvePointsBetween(
-        const vcg::Point3<PMesh::ScalarType> &p1, PMesh::FacePointer f1,
-        const vcg::Point3<PMesh::ScalarType> &p2, PMesh::FacePointer f2,
-        const vcg::Point3<PMesh::ScalarType> &viewDir, float mvpMatrix[16],
+        PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &p1,
+        PMesh::FacePointer f1, const vcg::Point3<PMesh::ScalarType> &p2,
+        PMesh::FacePointer f2, const vcg::Point3<PMesh::ScalarType> &viewDir,
+        float mvpMatrix[16],
         std::vector<vcg::Point3<PMesh::ScalarType>> &points);
 
   private:

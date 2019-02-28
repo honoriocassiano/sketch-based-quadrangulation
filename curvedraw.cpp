@@ -1,5 +1,6 @@
 #include "curvedraw.h"
 #include "utils/glutils.h"
+#include "vcg/complex/algorithms/update/flag.h"
 #include "vcg/simplex/face/pos.h"
 #include "vcg/space/intersection2.h"
 #include "wrap/gl/space.h"
@@ -59,7 +60,8 @@ void CurveDraw::startDraw() {
     drawMode = true;
 }
 
-void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
+void CurveDraw::addPoint(PMesh *mesh,
+                         const vcg::Point3<PMesh::ScalarType> &point,
                          PMesh::FacePointer face,
                          const vcg::Point3<PMesh::ScalarType> &viewDir,
                          float mvpMatrix[16], bool lastPoint) {
@@ -77,8 +79,8 @@ void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
             std::vector<vcg::Point3<PMesh::ScalarType>> points;
 
             bool pathExists =
-                getCurvePointsBetween(addedPoints.back(), faces.back(), point,
-                                      face, viewDir, mvpMatrix, points);
+                getCurvePointsBetween(mesh, addedPoints.back(), faces.back(),
+                                      point, face, viewDir, mvpMatrix, points);
 
             if (pathExists) {
                 if (!lastPoint) {
@@ -100,12 +102,11 @@ void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
 }
 
 bool CurveDraw::getCurvePointsBetween(
-    const vcg::Point3<PMesh::ScalarType> &p1, PMesh::FacePointer f1,
-    const vcg::Point3<PMesh::ScalarType> &p2, PMesh::FacePointer f2,
-    const vcg::Point3<PMesh::ScalarType> &viewDir, float mvpMatrix[],
-    std::vector<vcg::Point3<PMesh::ScalarType>> &points) {
+    PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &p1,
+    PMesh::FacePointer f1, const vcg::Point3<PMesh::ScalarType> &p2,
+    PMesh::FacePointer f2, const vcg::Point3<PMesh::ScalarType> &viewDir,
+    float mvpMatrix[], std::vector<vcg::Point3<PMesh::ScalarType>> &points) {
 
-    //    std::vector<vcg::Point3<PMesh::ScalarType>> points;
     bool hasPath = true;
 
     auto firstFace = f1;
@@ -185,6 +186,8 @@ bool CurveDraw::getCurvePointsBetween(
 
         /// Add point to possible curve points
         points.push_back(intersection);
+
+        currentFace->SetV();
     }
 
     auto pos = vcg::face::Pos<PMesh::FaceType>(currentFace, lastEdge);
@@ -201,13 +204,16 @@ bool CurveDraw::getCurvePointsBetween(
 
     while (currentFace != f2) {
 
-        if (currentFace == nullptr) {
-            // TODO Add status return
-            //            pathExists = false;
+        if (currentFace == nullptr || currentFace->IsV()) {
+            qDebug() << "No path found between " << p1 << " and " << p2;
+
             hasPath = false;
             points.clear();
             break;
         }
+
+        /// Set current face as visited
+        currentFace->SetV();
 
         qDebug() << "Face: " << currentFace;
 
@@ -283,15 +289,18 @@ bool CurveDraw::getCurvePointsBetween(
         lastEdge = pos.E();
     }
 
+    vcg::tri::UpdateFlags<PMesh>::FaceClearV(*mesh);
+
     return hasPath;
 }
 
-void CurveDraw::addPoint(const vcg::Point3<PMesh::ScalarType> &point,
+void CurveDraw::addPoint(PMesh *mesh,
+                         const vcg::Point3<PMesh::ScalarType> &point,
                          PMesh::FacePointer face,
                          const vcg::Point3<PMesh::ScalarType> &viewDir,
                          float mvpMatrix[16]) {
 
-    addPoint(point, face, viewDir, mvpMatrix, false);
+    addPoint(mesh, point, face, viewDir, mvpMatrix, false);
 }
 
 void CurveDraw::reset() {
@@ -301,9 +310,11 @@ void CurveDraw::reset() {
     faces.clear();
 }
 
-void CurveDraw::endDraw(const vcg::Point3<PMesh::ScalarType> &viewDir,
+void CurveDraw::endDraw(PMesh *mesh,
+                        const vcg::Point3<PMesh::ScalarType> &viewDir,
                         float mvpMatrix[16], bool _loop) {
-    addPoint(curvePoints.front(), faces.front(), viewDir, mvpMatrix, true);
+    addPoint(mesh, curvePoints.front(), faces.front(), viewDir, mvpMatrix,
+             true);
 
     drawMode = false;
     loop = _loop;

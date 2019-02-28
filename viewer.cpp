@@ -74,8 +74,8 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
                 float matrix[16];
                 camera()->getModelViewProjectionMatrix(matrix);
 
-                app.getDrawer()->endDraw(qtToVCG(camera()->viewDirection()),
-                                         matrix);
+                app.getDrawer()->endDraw(
+                    app.getMesh(), qtToVCG(camera()->viewDirection()), matrix);
 
                 lastState.valid = false;
             }
@@ -123,12 +123,13 @@ void Viewer::mouseMoveEvent(QMouseEvent *e) {
 
                     if (!drawer->isDrawing()) {
 
-                        drawer->addPoint(lastState.hitPoint, lastState.hitFace,
+                        drawer->addPoint(app.getMesh(), lastState.hitPoint,
+                                         lastState.hitFace,
                                          qtToVCG(camera()->viewDirection()),
                                          matrix);
                     }
 
-                    drawer->addPoint(hitPoint, face,
+                    drawer->addPoint(app.getMesh(), hitPoint, face,
                                      qtToVCG(camera()->viewDirection()),
                                      matrix);
 
