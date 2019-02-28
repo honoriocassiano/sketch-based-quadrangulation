@@ -1,5 +1,7 @@
 #include "intersection.h"
 
+#include "qdebug.h"
+
 #include <vcg/complex/algorithms/intersection.h>
 
 using ScalarType = PMesh::ScalarType;
@@ -19,9 +21,6 @@ bool intersectRayMesh(
     if (m == nullptr) {
         return false;
     }
-
-    // TriMeshType::FaceIterator fi;
-    // std::vector<TriMeshType::FaceType*>::iterator fi;
 
     ScalarType lastDist = INFINITY;
     ScalarType dist;
@@ -44,6 +43,7 @@ bool intersectRayMesh(
                 hitPoint = p1 * bar3 + p2 * bar1 + p3 * bar2;
                 fp = &(*fi);
                 hit = true;
+                lastDist = dist;
             }
         }
     }
