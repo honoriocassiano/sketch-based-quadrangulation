@@ -215,8 +215,6 @@ bool CurveDraw::getCurvePointsBetween(
         /// Set current face as visited
         currentFace->SetV();
 
-        qDebug() << "Face: " << currentFace;
-
         int nextEdge;
 
         /// Projected intersection point to check on 2D orthogonal to
