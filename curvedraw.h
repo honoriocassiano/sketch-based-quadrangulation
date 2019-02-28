@@ -71,6 +71,13 @@ class CurveDraw {
                   const vcg::Point3<PMesh::ScalarType> &viewDir,
                   float viewProjectionMatrix[16], bool lastPoint);
 
+    bool getCurvePointsBetween(
+        const vcg::Point3<PMesh::ScalarType> &p1, PMesh::FacePointer f1,
+        const vcg::Point3<PMesh::ScalarType> &p2, PMesh::FacePointer f2,
+        const vcg::Point3<PMesh::ScalarType> &viewDir, float mvpMatrix[16],
+        std::vector<vcg::Point3<PMesh::ScalarType>> &points);
+
+  private:
     bool loop;
     bool drawMode;
     std::vector<PMesh::FacePointer> faces;
