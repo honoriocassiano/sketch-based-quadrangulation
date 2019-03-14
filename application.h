@@ -47,6 +47,8 @@ class Application {
 
     inline PMesh *getMesh() { return &mesh; }
 
+    inline CMesh *getTrimesh() { return &trimesh; }
+
     Status showDrawing();
     Status switchShowingDrawing();
     Status hideDrawing();
@@ -61,6 +63,8 @@ class Application {
 
   private:
     PMesh mesh;
+    CMesh trimesh;
+
     CurveDraw drawer;
 
     CurrentState state;

@@ -23,7 +23,7 @@ class CurveDraw {
      * \brief Get all points added to drawing
      * \return vector containing the points
      */
-    std::vector<vcg::Point3<PMesh::ScalarType>> getPoints() const;
+    std::vector<vcg::Point3<CMesh::ScalarType>> getPoints() const;
 
     void draw() const;
 
@@ -42,15 +42,15 @@ class CurveDraw {
      * \param viewDir view direction of camera
      * \param face face that contains the point
      */
-    void addPoint(PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &point,
-                  PMesh::FacePointer face,
-                  const vcg::Point3<PMesh::ScalarType> &viewDir,
+    void addPoint(CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &point,
+                  CMesh::FacePointer face,
+                  const vcg::Point3<CMesh::ScalarType> &viewDir,
                   float viewProjectionMatrix[16]);
 
     /*!
      * \brief Deactivate drawing mode
      */
-    void endDraw(PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &viewDir,
+    void endDraw(CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &viewDir,
                  float viewProjectionMatrix[16], bool loop = true);
 
     /*!
@@ -66,25 +66,25 @@ class CurveDraw {
     void reset();
 
   private:
-    void addPoint(PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &point,
-                  PMesh::FacePointer face,
-                  const vcg::Point3<PMesh::ScalarType> &viewDir,
+    void addPoint(CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &point,
+                  CMesh::FacePointer face,
+                  const vcg::Point3<CMesh::ScalarType> &viewDir,
                   float viewProjectionMatrix[16], bool lastPoint);
 
     bool getCurvePointsBetween(
-        PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &p1,
-        PMesh::FacePointer f1, const vcg::Point3<PMesh::ScalarType> &p2,
-        PMesh::FacePointer f2, const vcg::Point3<PMesh::ScalarType> &viewDir,
+        CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &p1,
+        CMesh::FacePointer f1, const vcg::Point3<CMesh::ScalarType> &p2,
+        CMesh::FacePointer f2, const vcg::Point3<CMesh::ScalarType> &viewDir,
         float mvpMatrix[16],
-        std::vector<vcg::Point3<PMesh::ScalarType>> &points);
+        std::vector<vcg::Point3<CMesh::ScalarType>> &points);
 
   private:
     bool loop;
     bool drawMode;
-    std::vector<PMesh::FacePointer> faces;
+    std::vector<CMesh::FacePointer> faces;
     std::vector<std::size_t> pointsMap;
-    std::vector<vcg::Point3<PMesh::ScalarType>> curvePoints;
-    std::vector<vcg::Point3<PMesh::ScalarType>> addedPoints;
+    std::vector<vcg::Point3<CMesh::ScalarType>> curvePoints;
+    std::vector<vcg::Point3<CMesh::ScalarType>> addedPoints;
 };
 
 #endif // CURVEDRAW2_H

@@ -28,7 +28,7 @@ CurveDraw::~CurveDraw() {}
 
 bool CurveDraw::isDrawing() const { return drawMode; }
 
-std::vector<vcg::Point3<PMesh::ScalarType>> CurveDraw::getPoints() const {
+std::vector<vcg::Point3<CMesh::ScalarType>> CurveDraw::getPoints() const {
     return addedPoints;
 }
 
@@ -60,10 +60,10 @@ void CurveDraw::startDraw() {
     drawMode = true;
 }
 
-void CurveDraw::addPoint(PMesh *mesh,
-                         const vcg::Point3<PMesh::ScalarType> &point,
-                         PMesh::FacePointer face,
-                         const vcg::Point3<PMesh::ScalarType> &viewDir,
+void CurveDraw::addPoint(CMesh *mesh,
+                         const vcg::Point3<CMesh::ScalarType> &point,
+                         CMesh::FacePointer face,
+                         const vcg::Point3<CMesh::ScalarType> &viewDir,
                          float mvpMatrix[16], bool lastPoint) {
     if (drawMode) {
 
@@ -76,7 +76,7 @@ void CurveDraw::addPoint(PMesh *mesh,
 
         } else {
 
-            std::vector<vcg::Point3<PMesh::ScalarType>> points;
+            std::vector<vcg::Point3<CMesh::ScalarType>> points;
 
             bool pathExists =
                 getCurvePointsBetween(mesh, addedPoints.back(), faces.back(),
@@ -102,10 +102,10 @@ void CurveDraw::addPoint(PMesh *mesh,
 }
 
 bool CurveDraw::getCurvePointsBetween(
-    PMesh *mesh, const vcg::Point3<PMesh::ScalarType> &p1,
-    PMesh::FacePointer f1, const vcg::Point3<PMesh::ScalarType> &p2,
-    PMesh::FacePointer f2, const vcg::Point3<PMesh::ScalarType> &viewDir,
-    float mvpMatrix[], std::vector<vcg::Point3<PMesh::ScalarType>> &points) {
+    CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &p1,
+    CMesh::FacePointer f1, const vcg::Point3<CMesh::ScalarType> &p2,
+    CMesh::FacePointer f2, const vcg::Point3<CMesh::ScalarType> &viewDir,
+    float mvpMatrix[], std::vector<vcg::Point3<CMesh::ScalarType>> &points) {
 
     bool hasPath = true;
 
@@ -126,22 +126,22 @@ bool CurveDraw::getCurvePointsBetween(
 
         /// Projected drawed segment
         auto projSegment =
-            vcg::Segment2<PMesh::ScalarType>(pStartPoint, pEndPoint);
+            vcg::Segment2<CMesh::ScalarType>(pStartPoint, pEndPoint);
 
         /// Projected intersection point to check on 2D orthogonal to
         /// viewDir
-        vcg::Point2<PMesh::ScalarType> projIntersection;
+        vcg::Point2<CMesh::ScalarType> projIntersection;
 
         /// Projected intersection point to check on 3D
-        vcg::Point3<PMesh::ScalarType> intersection;
+        vcg::Point3<CMesh::ScalarType> intersection;
 
         /// Edge points on 3D space
-        vcg::Point3<PMesh::ScalarType> edgePoint1;
-        vcg::Point3<PMesh::ScalarType> edgePoint2;
+        vcg::Point3<CMesh::ScalarType> edgePoint1;
+        vcg::Point3<CMesh::ScalarType> edgePoint2;
 
         /// Projected edges
-        auto projSeg01 = vcg::Segment2<PMesh::ScalarType>(projV0, projV1);
-        auto projSeg12 = vcg::Segment2<PMesh::ScalarType>(projV1, projV2);
+        auto projSeg01 = vcg::Segment2<CMesh::ScalarType>(projV0, projV1);
+        auto projSeg12 = vcg::Segment2<CMesh::ScalarType>(projV1, projV2);
 
         /// Check the intersection on 2D plane
         if (vcg::SegmentSegmentIntersection(projSegment, projSeg01,
@@ -168,13 +168,13 @@ bool CurveDraw::getCurvePointsBetween(
 
         /// Plane that cut the face. That plane passes through drawed
         /// vertices with direction=viewDir
-        vcg::Plane3<PMesh::ScalarType> plane;
+        vcg::Plane3<CMesh::ScalarType> plane;
 
         /// Normal to the plane
-        vcg::Point3<PMesh::ScalarType> normal;
+        vcg::Point3<CMesh::ScalarType> normal;
 
         /// Line formed by the edge
-        vcg::Line3<PMesh::ScalarType> edgeLine(edgePoint1,
+        vcg::Line3<CMesh::ScalarType> edgeLine(edgePoint1,
                                                (edgePoint2 - edgePoint1));
 
         CROSS(normal, viewDir, (addedPoints.back() - p2));
@@ -190,7 +190,7 @@ bool CurveDraw::getCurvePointsBetween(
         currentFace->SetV();
     }
 
-    auto pos = vcg::face::Pos<PMesh::FaceType>(currentFace, lastEdge);
+    auto pos = vcg::face::Pos<CMesh::FaceType>(currentFace, lastEdge);
 
     /// Flip to adjacent face
     pos.FlipF();
@@ -200,7 +200,7 @@ bool CurveDraw::getCurvePointsBetween(
     lastEdge = pos.E();
 
     auto projLine =
-        vcg::Line2<PMesh::ScalarType>(pStartPoint, pEndPoint - pStartPoint);
+        vcg::Line2<CMesh::ScalarType>(pStartPoint, pEndPoint - pStartPoint);
 
     while (currentFace != f2) {
 
@@ -219,17 +219,17 @@ bool CurveDraw::getCurvePointsBetween(
 
         /// Projected intersection point to check on 2D orthogonal to
         /// viewDir
-        vcg::Point2<PMesh::ScalarType> projIntersection;
+        vcg::Point2<CMesh::ScalarType> projIntersection;
 
         /// Projected intersection point to check on 3D
-        vcg::Point3<PMesh::ScalarType> intersection;
+        vcg::Point3<CMesh::ScalarType> intersection;
 
         /// Edge points on 3D space
-        vcg::Point3<PMesh::ScalarType> edgePoint1;
-        vcg::Point3<PMesh::ScalarType> edgePoint2;
+        vcg::Point3<CMesh::ScalarType> edgePoint1;
+        vcg::Point3<CMesh::ScalarType> edgePoint2;
 
         /// Projected edges
-        vcg::Segment2<PMesh::ScalarType> projEdge;
+        vcg::Segment2<CMesh::ScalarType> projEdge;
 
         projEdge.Set(
             getProjectedPoint(currentFace->V(lastEdge)->P(), mvpMatrix),
@@ -257,13 +257,13 @@ bool CurveDraw::getCurvePointsBetween(
 
         /// Plane that cut the face. That plane passes through drawed
         /// vertices with direction=viewDir
-        vcg::Plane3<PMesh::ScalarType> plane;
+        vcg::Plane3<CMesh::ScalarType> plane;
 
         /// Normal to the plane
-        vcg::Point3<PMesh::ScalarType> normal;
+        vcg::Point3<CMesh::ScalarType> normal;
 
         /// Line formed by the edge
-        vcg::Line3<PMesh::ScalarType> edgeLine(edgePoint1,
+        vcg::Line3<CMesh::ScalarType> edgeLine(edgePoint1,
                                                (edgePoint2 - edgePoint1));
 
         CROSS(normal, viewDir, (addedPoints.back() - p2));
@@ -277,7 +277,7 @@ bool CurveDraw::getCurvePointsBetween(
         points.push_back(intersection);
 
         /// New Pos
-        pos = vcg::face::Pos<PMesh::FaceType>(currentFace, nextEdge);
+        pos = vcg::face::Pos<CMesh::FaceType>(currentFace, nextEdge);
 
         /// Flip to adjacent face
         pos.FlipF();
@@ -287,15 +287,15 @@ bool CurveDraw::getCurvePointsBetween(
         lastEdge = pos.E();
     }
 
-    vcg::tri::UpdateFlags<PMesh>::FaceClearV(*mesh);
+    vcg::tri::UpdateFlags<CMesh>::FaceClearV(*mesh);
 
     return hasPath;
 }
 
-void CurveDraw::addPoint(PMesh *mesh,
-                         const vcg::Point3<PMesh::ScalarType> &point,
-                         PMesh::FacePointer face,
-                         const vcg::Point3<PMesh::ScalarType> &viewDir,
+void CurveDraw::addPoint(CMesh *mesh,
+                         const vcg::Point3<CMesh::ScalarType> &point,
+                         CMesh::FacePointer face,
+                         const vcg::Point3<CMesh::ScalarType> &viewDir,
                          float mvpMatrix[16]) {
 
     addPoint(mesh, point, face, viewDir, mvpMatrix, false);
@@ -308,8 +308,8 @@ void CurveDraw::reset() {
     faces.clear();
 }
 
-void CurveDraw::endDraw(PMesh *mesh,
-                        const vcg::Point3<PMesh::ScalarType> &viewDir,
+void CurveDraw::endDraw(CMesh *mesh,
+                        const vcg::Point3<CMesh::ScalarType> &viewDir,
                         float mvpMatrix[16], bool _loop) {
     addPoint(mesh, curvePoints.front(), faces.front(), viewDir, mvpMatrix,
              true);

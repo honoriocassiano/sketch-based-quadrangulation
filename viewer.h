@@ -13,8 +13,8 @@ class Viewer : public QGLViewer {
   private:
     struct LastState {
         QPoint windowPosition;
-        PMesh::FacePointer hitFace;
-        vcg::Point3<PMesh::ScalarType> hitPoint;
+        CMesh::FacePointer hitFace;
+        vcg::Point3<CMesh::ScalarType> hitPoint;
         bool valid;
 
         LastState() : valid(false) {}

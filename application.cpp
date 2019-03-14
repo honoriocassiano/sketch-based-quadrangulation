@@ -15,8 +15,18 @@ Status Application::loadMesh(std::string filename) {
     mesh.Clear();
     int err = vcg::tri::io::Importer<PMesh>::Open(mesh, filename.c_str());
 
+    /// Create a triangular mesh from input
+    trimesh.Clear();
+    vcg::tri::PolygonSupport<CMesh, PMesh>::ImportFromPolyMesh(trimesh, mesh);
+    // update bounding box
+    vcg::tri::UpdateBounding<CMesh>::Box(trimesh);
+    // update Normals
+    vcg::tri::UpdateNormal<CMesh>::PerVertexNormalizedPerFace(trimesh);
+    vcg::tri::UpdateNormal<CMesh>::PerFaceNormalized(trimesh);
+
     /// Update face-face topology
     vcg::tri::UpdateTopology<PMesh>::FaceFace(mesh);
+    vcg::tri::UpdateTopology<CMesh>::FaceFace(trimesh);
 
     if (!err) {
         return STATUS_OK;
@@ -58,19 +68,17 @@ void Application::draw() const {
 
         glColor3f(1, 1, 1);
 
-        for (auto it = mesh.face.begin(); it != mesh.face.end(); ++it) {
-            //    for (auto it = mesh.vert.begin(); it != mesh.vert.end(); ++it)
-            //    {
-            //        vcg::glVertex(it->P());
-            glBegin(GL_POLYGON);
+        glBegin(GL_TRIANGLES);
+
+        for (auto it = trimesh.face.begin(); it != trimesh.face.end(); ++it) {
 
             vcg::glNormal(it->cN());
-            for (int j = 0; j < it->VN(); j++) {
-                vcg::glVertex(it->V(j)->P());
-            }
 
-            glEnd();
+            vcg::glVertex((*it).cV(0)->P());
+            vcg::glVertex((*it).cV(1)->P());
+            vcg::glVertex((*it).cV(2)->P());
         }
+        glEnd();
 
         glDisable(GL_POLYGON_OFFSET_FILL);
     }

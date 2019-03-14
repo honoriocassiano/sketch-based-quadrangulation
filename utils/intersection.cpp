@@ -4,18 +4,21 @@
 
 #include <vcg/complex/algorithms/intersection.h>
 
-using ScalarType = PMesh::ScalarType;
+// using ScalarType = PMesh::ScalarType;
 
 bool intersectRayMesh(
-    /* Input Mesh */ PMesh *m,
-    /* Ray */ const vcg::Line3<ScalarType> &ray,
-    /* Intersect Point */ vcg::Point3<ScalarType> &hitPoint,
-    /* Baricentric coord 1*/ ScalarType &bar1,
-    /* Baricentric coord 2*/ ScalarType &bar2,
-    /* Baricentric coord 3*/ ScalarType &bar3,
-    /* FacePointer */ PMesh::FacePointer &fp) {
-    // typedef typename TriMeshType::FaceContainer FaceContainer;
-    typename PMesh::FaceIterator fi;
+    /* Input Mesh */ CMesh *m,
+    /* Ray */ const vcg::Line3<typename CMesh::ScalarType> &ray,
+    /* Intersect Point */ vcg::Point3<typename CMesh::ScalarType> &hitPoint,
+    /* Baricentric coord 1*/ typename CMesh::ScalarType &bar1,
+    /* Baricentric coord 2*/ typename CMesh::ScalarType &bar2,
+    /* Baricentric coord 3*/ typename CMesh::ScalarType &bar3,
+    /* FacePointer */ typename CMesh::FacePointer &fp) {
+    // typedef typename TriCMesh::FaceContainer FaceContainer;
+
+    using ScalarType = typename CMesh::ScalarType;
+
+    typename CMesh::FaceIterator fi;
     bool hit = false;
 
     if (m == nullptr) {

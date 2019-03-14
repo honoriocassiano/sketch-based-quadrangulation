@@ -56,13 +56,14 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
 
         this->camera()->convertClickToLine(e->pos(), orig, dir);
 
-        vcg::Point3<PMesh::ScalarType> hitPoint;
-        vcg::Line3<PMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
+        vcg::Point3<CMesh::ScalarType> hitPoint;
+        vcg::Line3<CMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
 
-        PMesh::ScalarType b1, b2, b3;
-        PMesh::FacePointer face = nullptr;
+        CMesh::ScalarType b1, b2, b3;
+        CMesh::FacePointer face = nullptr;
 
-        if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3, face)) {
+        if (intersectRayMesh(app.getTrimesh(), ray, hitPoint, b1, b2, b3,
+                             face)) {
 
             if (e->button() == Qt::MouseButton::LeftButton) {
                 lastState.windowPosition = e->pos();
@@ -74,8 +75,9 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
                 float matrix[16];
                 camera()->getModelViewProjectionMatrix(matrix);
 
-                app.getDrawer()->endDraw(
-                    app.getMesh(), qtToVCG(camera()->viewDirection()), matrix);
+                app.getDrawer()->endDraw(app.getTrimesh(),
+                                         qtToVCG(camera()->viewDirection()),
+                                         matrix);
 
                 lastState.valid = false;
             }
@@ -99,13 +101,13 @@ void Viewer::mouseMoveEvent(QMouseEvent *e) {
 
             this->camera()->convertClickToLine(e->pos(), orig, dir);
 
-            vcg::Point3<PMesh::ScalarType> hitPoint;
-            vcg::Line3<PMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
+            vcg::Point3<CMesh::ScalarType> hitPoint;
+            vcg::Line3<CMesh::ScalarType> ray(qtToVCG(orig), qtToVCG(dir));
 
-            PMesh::ScalarType b1, b2, b3;
-            PMesh::FacePointer face = nullptr;
+            CMesh::ScalarType b1, b2, b3;
+            CMesh::FacePointer face = nullptr;
 
-            if (intersectRayMesh(app.getMesh(), ray, hitPoint, b1, b2, b3,
+            if (intersectRayMesh(app.getTrimesh(), ray, hitPoint, b1, b2, b3,
                                  face)) {
 
                 if (max(abs(e->pos().x() - lastState.windowPosition.x()),
@@ -123,13 +125,13 @@ void Viewer::mouseMoveEvent(QMouseEvent *e) {
 
                     if (!drawer->isDrawing()) {
 
-                        drawer->addPoint(app.getMesh(), lastState.hitPoint,
+                        drawer->addPoint(app.getTrimesh(), lastState.hitPoint,
                                          lastState.hitFace,
                                          qtToVCG(camera()->viewDirection()),
                                          matrix);
                     }
 
-                    drawer->addPoint(app.getMesh(), hitPoint, face,
+                    drawer->addPoint(app.getTrimesh(), hitPoint, face,
                                      qtToVCG(camera()->viewDirection()),
                                      matrix);
 
