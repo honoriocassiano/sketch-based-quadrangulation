@@ -2,6 +2,7 @@
 #define APPLICATION_H
 
 #include "curvedraw.h"
+#include "mesh.h"
 #include "meshtypes.h"
 #include "utils/utils.h"
 
@@ -45,9 +46,7 @@ class Application {
      */
     Status hideMesh();
 
-    inline PMesh *getMesh() { return &mesh; }
-
-    inline CMesh *getTrimesh() { return &trimesh; }
+    inline Mesh *getMesh() { return &mesh; }
 
     Status showDrawing();
     Status switchShowingDrawing();
@@ -62,8 +61,9 @@ class Application {
     void draw() const;
 
   private:
-    PMesh mesh;
-    CMesh trimesh;
+    //    PMesh mesh;
+    //    CMesh trimesh;
+    Mesh mesh;
 
     CurveDraw drawer;
 

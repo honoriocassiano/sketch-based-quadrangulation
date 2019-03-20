@@ -48,7 +48,8 @@ SOURCES += \
     utils/intersection.cpp \
     curvedraw.cpp \
     utils/qutils.cpp \
-    utils/glutils.cpp
+    utils/glutils.cpp \
+    mesh.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -61,7 +62,9 @@ HEADERS += \
     utils/object.h \
     utils/intersection.h \
     curvedraw.h \
-    utils/glutils.h
+    quad_tracer.h \
+    utils/glutils.h \
+    mesh.h
 
 FORMS += \
         mainwindow.ui

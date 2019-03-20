@@ -5,39 +5,17 @@
 #include "vcg/complex/algorithms/update/topology.h"
 #include <GL/gl.h>
 #include <wrap/gl/space.h>
-#include <wrap/io_trimesh/import.h>
 
 Application::Application() {}
 
 Application::~Application() {}
 
 Status Application::loadMesh(std::string filename) {
-    mesh.Clear();
-    int err = vcg::tri::io::Importer<PMesh>::Open(mesh, filename.c_str());
-
-    /// Create a triangular mesh from input
-    trimesh.Clear();
-    vcg::tri::PolygonSupport<CMesh, PMesh>::ImportFromPolyMesh(trimesh, mesh);
-    // update bounding box
-    vcg::tri::UpdateBounding<CMesh>::Box(trimesh);
-    // update Normals
-    vcg::tri::UpdateNormal<CMesh>::PerVertexNormalizedPerFace(trimesh);
-    vcg::tri::UpdateNormal<CMesh>::PerFaceNormalized(trimesh);
-
-    /// Update face-face topology
-    vcg::tri::UpdateTopology<PMesh>::FaceFace(mesh);
-    vcg::tri::UpdateTopology<CMesh>::FaceFace(trimesh);
-
-    if (!err) {
-        return STATUS_OK;
-    } else {
-        return Status::make(false,
-                            vcg::tri::io::Importer<PMesh>::ErrorMsg(err));
-    }
+    return mesh.load(filename);
 }
 
 Status Application::showMesh() {
-    if (mesh.VertexNumber() > 0) {
+    if (mesh.get()->VertexNumber() > 0) {
         state.meshVisible = true;
 
         return STATUS_OK;
@@ -70,7 +48,8 @@ void Application::draw() const {
 
         glBegin(GL_TRIANGLES);
 
-        for (auto it = trimesh.face.begin(); it != trimesh.face.end(); ++it) {
+        for (auto it = mesh.getTrimesh()->face.begin();
+             it != mesh.getTrimesh()->face.end(); ++it) {
 
             vcg::glNormal(it->cN());
 
