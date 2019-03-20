@@ -11,6 +11,8 @@ class Mesh {
 
     Status load(std::string filename);
 
+    void draw() const;
+
     inline PMesh *get() { return &mesh; }
 
     inline CMesh *getTrimesh() { return &trimesh; }

@@ -41,29 +41,10 @@ void Application::draw() const {
 
     glPushMatrix();
     if (state.meshVisible) {
-
-        glEnable(GL_POLYGON_OFFSET_FILL);
-
-        glColor3f(1, 1, 1);
-
-        glBegin(GL_TRIANGLES);
-
-        for (auto it = mesh.getTrimesh()->face.begin();
-             it != mesh.getTrimesh()->face.end(); ++it) {
-
-            vcg::glNormal(it->cN());
-
-            vcg::glVertex((*it).cV(0)->P());
-            vcg::glVertex((*it).cV(1)->P());
-            vcg::glVertex((*it).cV(2)->P());
-        }
-        glEnd();
-
-        glDisable(GL_POLYGON_OFFSET_FILL);
+        mesh.draw();
     }
 
     if (state.drawVisible) {
-
         drawer.draw();
     }
     glPopMatrix();

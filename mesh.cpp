@@ -1,6 +1,8 @@
 #include "mesh.h"
 
 #include "wrap/io_trimesh/import.h"
+#include <GL/gl.h>
+#include <wrap/gl/space.h>
 
 Mesh::Mesh() {}
 
@@ -29,4 +31,24 @@ Status Mesh::load(string filename) {
         return Status::make(false,
                             vcg::tri::io::Importer<PMesh>::ErrorMsg(err));
     }
+}
+
+void Mesh::draw() const {
+    glEnable(GL_POLYGON_OFFSET_FILL);
+
+    glColor3f(1, 1, 1);
+
+    glBegin(GL_TRIANGLES);
+
+    for (auto it = trimesh.face.begin(); it != trimesh.face.end(); ++it) {
+
+        vcg::glNormal(it->cN());
+
+        vcg::glVertex((*it).cV(0)->P());
+        vcg::glVertex((*it).cV(1)->P());
+        vcg::glVertex((*it).cV(2)->P());
+    }
+    glEnd();
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
 }
