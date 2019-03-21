@@ -29,11 +29,11 @@ CONFIG += c++11
 
 INCLUDEPATH += $$VCGLIB_PATH/ $$LIBQGLVIEWER_PATH
 
-LIBS += -L$$LIBQGLVIEWER_PATH -lQGLViewer-qt5 -lGLEW  -lGLU -lGL -fopenmp
+LIBS += -L$$LIBQGLVIEWER_PATH -lQGLViewer-qt5 -lGLEW -lGLU -lGL -fopenmp
 #LIBS += -lQGLViewer-qt5
 
-PRECOMPILED_HEADER =$$PWD/precompiled_libraries.h
-CONFIG += precompiled_header
+PRECOMPILED_HEADER = $$PWD/precompiled_libraries.h
+CONFIG += precompile_header
 
 DESTDIR =       $$PWD/bin
 
@@ -42,7 +42,7 @@ SUBDIRS = \
         $$LIBQGLVIEWER_PATH
 
 SOURCES += \
-        main.cpp \
+    main.cpp \
     mesh.cpp \
     vcglib/wrap/ply/plylib.cpp \
     mainwindow.cpp \
@@ -55,8 +55,9 @@ SOURCES += \
     utils/glutils.cpp
 
 HEADERS += \
+    precompiled_libraries.h \
     mesh.h \
-        mainwindow.h \
+    mainwindow.h \
     application.h \
     viewer.h \
     meshtypes.h \
