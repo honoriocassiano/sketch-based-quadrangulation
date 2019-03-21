@@ -1,8 +1,6 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
-#include <GL/glew.h>
-
 #include "curvedraw.h"
 #include "mesh.h"
 

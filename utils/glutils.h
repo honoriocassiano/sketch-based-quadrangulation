@@ -1,8 +1,6 @@
 #ifndef GLUTILS_H
 #define GLUTILS_H
 
-#include <GL/glew.h>
-
 #include "meshtypes.h"
 
 vcg::Point2<PMesh::ScalarType>
