@@ -167,6 +167,8 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
 
     } else if (e->key() == Qt::Key::Key_D) {
         st = app.switchShowingDrawing();
+    } else if (e->key() == Qt::Key::Key_H) {
+        emit help();
     }
 
     if (!st.result) {
@@ -180,4 +182,10 @@ void Viewer::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     app.draw();
+}
+
+QString Viewer::helpString() const {
+    QString text("");
+
+    return text;
 }

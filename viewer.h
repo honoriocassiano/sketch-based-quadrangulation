@@ -34,6 +34,8 @@ class Viewer : public QGLViewer {
     void init() override;
     void draw() override;
 
+    QString helpString() const override;
+
     void mouseMoveEvent(QMouseEvent *) override;
     void mousePressEvent(QMouseEvent *) override;
     //    virtual QString helpString() const;
