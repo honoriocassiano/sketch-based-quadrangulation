@@ -30,13 +30,33 @@ Status Application::switchShowingMesh() {
     return showMesh();
 }
 
+Status Application::showPatches() {
+    // TODO Add checks here
+    state.patchVisible = true;
+
+    return STATUS_OK;
+}
+Status Application::hidePatches() {
+    // TODO Add checks here
+    state.patchVisible = false;
+
+    return STATUS_OK;
+}
+
+Status Application::switchShowingPatches() {
+    if (state.patchVisible) {
+        return hidePatches();
+    }
+    return showPatches();
+}
+
 Status Application::hideMesh() {
     state.meshVisible = false;
 
     return STATUS_OK;
 }
 
-void Application::draw() const {
+void Application::draw() {
 
     glPushMatrix();
     if (state.meshVisible) {
@@ -44,9 +64,13 @@ void Application::draw() const {
     }
 
     if (state.drawVisible) {
-
         drawer.draw();
     }
+
+    if (state.patchVisible) {
+        mesh.drawEdges();
+    }
+
     glPopMatrix();
 }
 
@@ -76,4 +100,5 @@ Status Application::hideDrawing() {
 Application::CurrentState::CurrentState() {
     drawVisible = false;
     meshVisible = false;
+    patchVisible = false;
 }

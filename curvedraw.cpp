@@ -35,7 +35,7 @@ std::vector<vcg::Point3<CMesh::ScalarType>> CurveDraw::getPoints() const {
 void CurveDraw::draw() const {
     glDisable(GL_LIGHTING);
 
-    glColor3f(0, 0, 0);
+    glColor3f(0, 1, 0);
 
     glLineWidth(2.5);
 

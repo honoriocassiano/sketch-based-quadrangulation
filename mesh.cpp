@@ -33,6 +33,8 @@ Status Mesh::load(string filename) {
     tracer.TracePartitions();
     tracer.SaveColoredMesh();
 
+    computeBorderPatch();
+
     if (!err) {
         return STATUS_OK;
     } else {
@@ -65,6 +67,8 @@ void Mesh::drawEdges() {
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glEnable(GL_LINE_SMOOTH);
     glLineWidth(3.0);
+
+    glColor3f(1, 0, 0);
     glEdgeMesh
         .Draw<vcg::GLW::DMFlatWire, vcg::GLW::CMPerVert, vcg::GLW::TMNone>();
     glLineWidth(1);

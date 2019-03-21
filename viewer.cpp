@@ -167,6 +167,8 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
 
     } else if (e->key() == Qt::Key::Key_D) {
         st = app.switchShowingDrawing();
+    } else if (e->key() == Qt::Key::Key_P) {
+        st = app.switchShowingPatches();
     } else if (e->key() == Qt::Key::Key_H) {
         emit help();
     }

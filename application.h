@@ -14,6 +14,7 @@ class Application {
     struct CurrentState {
         bool drawVisible;
         bool meshVisible;
+        bool patchVisible;
 
         CurrentState();
     };
@@ -49,6 +50,12 @@ class Application {
 
     inline Mesh *getMesh() { return &mesh; }
 
+    Status showPatches();
+    Status hidePatches();
+    Status switchShowingPatches();
+
+    inline bool isShowingPatches() const { return state.meshVisible; }
+
     Status showDrawing();
     Status switchShowingDrawing();
     Status hideDrawing();
@@ -59,7 +66,7 @@ class Application {
     /*!
      * \brief Draw the scene based on current state
      */
-    void draw() const;
+    void draw();
 
   private:
     //    PMesh mesh;
