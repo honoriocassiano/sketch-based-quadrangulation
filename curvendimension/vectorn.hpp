@@ -396,20 +396,20 @@ public:
 
 
 /// Makes scalar multiplication commutative.
-template < typename real, unsigned int dim >
-inline VectorN<real,dim> operator*(real s, const VectorN<real,dim>& v) {
+template < typename scalar, typename real, unsigned int dim >
+inline VectorN<real,dim> operator*(scalar s, const VectorN<real,dim>& v) {
     return v*s;
 }
 
 /// Makes scalar vector sum commutative.
-template < typename real, unsigned int dim >
-inline VectorN<real,dim> operator+(real s, const VectorN<real,dim>& v) {
+template < typename scalar, typename real, unsigned int dim >
+inline VectorN<real,dim> operator+(scalar s, const VectorN<real,dim>& v) {
     return v+s;
 }
 
 /// Makes scalar vector difference commutative.
-template < typename real, unsigned int dim >
-inline VectorN<real,dim> operator-(real s, const VectorN<real,dim>& v) {
+template < typename scalar, typename real, unsigned int dim >
+inline VectorN<real,dim> operator-(scalar s, const VectorN<real,dim>& v) {
     return -(v-s);
 }
 
