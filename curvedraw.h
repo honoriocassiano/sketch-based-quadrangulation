@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include <GL/glew.h>
+
 #include "meshtypes.h"
 #include "utils/standardCamera.h"
 #include "utils/utils.h"

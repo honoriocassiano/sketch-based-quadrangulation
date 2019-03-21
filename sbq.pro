@@ -32,6 +32,9 @@ INCLUDEPATH += $$VCGLIB_PATH/ $$LIBQGLVIEWER_PATH
 LIBS += -L$$LIBQGLVIEWER_PATH -lQGLViewer-qt5 -lGLEW  -lGLU -lGL -fopenmp
 #LIBS += -lQGLViewer-qt5
 
+PRECOMPILED_HEADER =$$PWD/precompiled_libraries.h
+CONFIG += precompiled_header
+
 DESTDIR =       $$PWD/bin
 
 # Subprojects
@@ -40,6 +43,7 @@ SUBDIRS = \
 
 SOURCES += \
         main.cpp \
+    mesh.cpp \
     vcglib/wrap/ply/plylib.cpp \
     mainwindow.cpp \
     application.cpp \
@@ -48,10 +52,10 @@ SOURCES += \
     utils/intersection.cpp \
     curvedraw.cpp \
     utils/qutils.cpp \
-    utils/glutils.cpp \
-    mesh.cpp
+    utils/glutils.cpp
 
 HEADERS += \
+    mesh.h \
         mainwindow.h \
     application.h \
     viewer.h \
@@ -63,8 +67,7 @@ HEADERS += \
     utils/intersection.h \
     curvedraw.h \
     quad_tracer.h \
-    utils/glutils.h \
-    mesh.h
+    utils/glutils.h
 
 FORMS += \
         mainwindow.ui

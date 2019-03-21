@@ -3,7 +3,6 @@
 #include "qdebug.h"
 
 #include "vcg/complex/algorithms/update/topology.h"
-#include <GL/gl.h>
 #include <wrap/gl/space.h>
 
 Application::Application() {}
@@ -45,6 +44,7 @@ void Application::draw() const {
     }
 
     if (state.drawVisible) {
+
         drawer.draw();
     }
     glPopMatrix();
