@@ -52,7 +52,8 @@ SOURCES += \
     utils/intersection.cpp \
     curvedraw.cpp \
     utils/qutils.cpp \
-    utils/glutils.cpp
+    utils/glutils.cpp \
+    meshattributes.cpp
 
 HEADERS += \
     precompiled_libraries.h \
@@ -70,7 +71,8 @@ HEADERS += \
     utils/intersection.h \
     curvedraw.h \
     quad_tracer.h \
-    utils/glutils.h
+    utils/glutils.h \
+    meshattributes.h
 
 FORMS += \
         mainwindow.ui

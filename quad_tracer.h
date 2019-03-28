@@ -1,5 +1,7 @@
 #ifndef QUAD_TRACER
 #define QUAD_TRACER
+#include "meshattributes.h"
+
 #include <unordered_map>
 #include <vcg/complex/algorithms/clean.h>
 #include <vcg/complex/algorithms/update/bounding.h>
@@ -19,6 +21,7 @@ template <class PolyMeshType> class QuadMeshTracer {
 
   public:
     bool MotorCycle = true;
+    std::size_t patchesSize;
     std::vector<int> FacePatch;
     bool DebugMessages = false;
 
@@ -49,11 +52,25 @@ template <class PolyMeshType> class QuadMeshTracer {
         }
     }
 
-    int SplitIntoPatches() {
+    std::size_t SplitIntoPatches() {
+
+        /// Check if patch id is set
+        bool hasPatchId =
+            vcg::tri::HasPerFaceAttribute(*PolyM, MeshAttr::PATCH);
+        if (hasPatchId) {
+            vcg::tri::Allocator<PolyMeshType>::DeletePerFaceAttribute(
+                *PolyM, MeshAttr::PATCH);
+        }
+
+        /// Create patch id attribute
+        auto patchId =
+            vcg::tri::Allocator<PolyMeshType>::template GetPerFaceAttribute<
+                std::size_t>(*PolyM, MeshAttr::PATCH);
+
         FacePatch.resize((*PolyM).face.size(), -1);
         std::vector<size_t> StackMoves;
         vcg::tri::UpdateFlags<PolyMeshType>::FaceClearS(*PolyM);
-        int currPartition = 0;
+        std::size_t currPartition = 0;
         while (true) {
             // find next seed
             for (size_t i = 0; i < (*PolyM).face.size(); i++) {
@@ -74,6 +91,10 @@ template <class PolyMeshType> class QuadMeshTracer {
                 (*PolyM).face[currF].SetS();
                 StackMoves.pop_back();
                 FacePatch[currF] = currPartition;
+
+                /// Set patch id
+                patchId[PolyM->face.begin() + currF] = currPartition;
+
                 for (int j = 0; j < (*PolyM).face[currF].VN(); j++) {
                     size_t IndexV0 =
                         vcg::tri::Index(*PolyM, (*PolyM).face[currF].V0(j));
@@ -192,7 +213,7 @@ template <class PolyMeshType> class QuadMeshTracer {
 
         DoTrace();
 
-        SplitIntoPatches();
+        patchesSize = SplitIntoPatches();
     }
 
     // QuadMeshTracer(PolyMeshType &_PolyM):PolyM(_PolyM){}
