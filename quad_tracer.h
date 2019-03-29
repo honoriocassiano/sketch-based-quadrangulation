@@ -6,11 +6,9 @@
 #include "utils/utils.h"
 
 #include <unordered_map>
-#include <vcg/complex/algorithms/clean.h>
 #include <vcg/complex/algorithms/update/bounding.h>
 #include <vcg/complex/algorithms/update/normal.h>
 #include <vcg/complex/algorithms/update/quality.h>
-#include <vcg/complex/algorithms/update/topology.h>
 #include <vcg/complex/append.h>
 
 template <class PolyMeshType> class QuadMeshTracer {
