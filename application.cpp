@@ -17,7 +17,7 @@ Status Application::showMesh() {
     if (mesh.get()->VertexNumber() > 0) {
         state.meshVisible = true;
 
-        return STATUS_OK;
+        return Status::OK;
     }
 
     return Status::make(false, "Cannot display an empty mesh!");
@@ -34,13 +34,13 @@ Status Application::showPatches() {
     // TODO Add checks here
     state.patchVisible = true;
 
-    return STATUS_OK;
+    return Status::OK;
 }
 Status Application::hidePatches() {
     // TODO Add checks here
     state.patchVisible = false;
 
-    return STATUS_OK;
+    return Status::OK;
 }
 
 Status Application::switchShowingPatches() {
@@ -53,7 +53,7 @@ Status Application::switchShowingPatches() {
 Status Application::hideMesh() {
     state.meshVisible = false;
 
-    return STATUS_OK;
+    return Status::OK;
 }
 
 void Application::draw() {
@@ -78,7 +78,7 @@ Status Application::showDrawing() {
     if (drawer.getSize() > 0) {
         state.drawVisible = true;
 
-        return STATUS_OK;
+        return Status::OK;
     }
 
     return Status::make(false, "No drawing to show!");
@@ -94,7 +94,7 @@ Status Application::switchShowingDrawing() {
 
 Status Application::hideDrawing() {
     state.drawVisible = false;
-    return STATUS_OK;
+    return Status::OK;
 }
 
 Application::CurrentState::CurrentState() {

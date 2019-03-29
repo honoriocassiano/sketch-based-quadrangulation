@@ -10,8 +10,8 @@ struct Status {
     static Status make(bool r, std::string m) { return Status{r, m}; }
 
     operator bool() const { return result; }
-};
 
-static const Status STATUS_OK = {true, "OK!"};
+    static const Status OK;
+};
 
 #endif // UTILS_H

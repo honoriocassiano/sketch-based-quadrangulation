@@ -36,7 +36,7 @@ Status Mesh::load(string filename) {
     computeBorderPatch();
 
     if (!err) {
-        return STATUS_OK;
+        return Status::OK;
     } else {
         return Status::make(false,
                             vcg::tri::io::Importer<PMesh>::ErrorMsg(err));

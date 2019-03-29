@@ -28,13 +28,13 @@ class Application {
      * \brief Load the mesh from a file. This method does not set the mesh state
      * as visible
      * \param filename File name
-     * \return STATUS_OK if success or a Status containing an error description
+     * \return Status::OK if success or a Status containing an error description
      */
     Status loadMesh(std::string filename);
 
     /*!
      * \brief Set the mesh state as visible to the next draw loop
-     * \return STATUS_OK if success or an error if the mesh if empty
+     * \return Status::OK if success or an error if the mesh if empty
      */
     Status showMesh();
 
@@ -44,7 +44,7 @@ class Application {
 
     /*!
      * \brief Set the mesh state as invisible to the next draw loop
-     * \return STATUS_OK
+     * \return Status::OK
      */
     Status hideMesh();
 
