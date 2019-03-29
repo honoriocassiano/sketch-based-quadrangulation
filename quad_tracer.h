@@ -1,6 +1,9 @@
 #ifndef QUAD_TRACER
 #define QUAD_TRACER
+
 #include "meshattributes.h"
+#include "utils/meshutils.h"
+#include "utils/utils.h"
 
 #include <unordered_map>
 #include <vcg/complex/algorithms/clean.h>
@@ -22,7 +25,6 @@ template <class PolyMeshType> class QuadMeshTracer {
   public:
     bool MotorCycle = true;
     std::size_t patchesSize;
-    std::vector<int> FacePatch;
     bool DebugMessages = false;
 
   private:
@@ -54,20 +56,10 @@ template <class PolyMeshType> class QuadMeshTracer {
 
     std::size_t SplitIntoPatches() {
 
-        /// Check if patch id is set
-        bool hasPatchId =
-            vcg::tri::HasPerFaceAttribute(*PolyM, MeshAttr::PATCH);
-        if (hasPatchId) {
-            vcg::tri::Allocator<PolyMeshType>::DeletePerFaceAttribute(
-                *PolyM, MeshAttr::PATCH);
-        }
+        /// Reset the ids if they exist
+        auto patchId = MeshUtils::resetFaceAttr<PolyMeshType, std::size_t>(
+            *PolyM, MeshAttr::PATCH);
 
-        /// Create patch id attribute
-        auto patchId =
-            vcg::tri::Allocator<PolyMeshType>::template GetPerFaceAttribute<
-                std::size_t>(*PolyM, MeshAttr::PATCH);
-
-        FacePatch.resize((*PolyM).face.size(), -1);
         std::vector<size_t> StackMoves;
         vcg::tri::UpdateFlags<PolyMeshType>::FaceClearS(*PolyM);
         std::size_t currPartition = 0;
@@ -90,7 +82,6 @@ template <class PolyMeshType> class QuadMeshTracer {
                 size_t currF = StackMoves.back();
                 (*PolyM).face[currF].SetS();
                 StackMoves.pop_back();
-                FacePatch[currF] = currPartition;
 
                 /// Set patch id
                 patchId[PolyM->face.begin() + currF] = currPartition;
@@ -119,7 +110,7 @@ template <class PolyMeshType> class QuadMeshTracer {
             }
             currPartition++;
         }
-        return -1;
+        return 0;
     }
 
     void DoTrace() {
@@ -172,15 +163,17 @@ template <class PolyMeshType> class QuadMeshTracer {
 
   public:
     void SaveColoredMesh() {
-        int NumPartitions = 0;
-        for (size_t i = 0; i < FacePatch.size(); i++)
-            NumPartitions = std::max(NumPartitions, FacePatch[i]);
 
-        for (size_t i = 0; i < (*PolyM).face.size(); i++) {
-            assert(FacePatch[i] >= 0);
+        for (auto it = PolyM->face.begin(); it != PolyM->face.end(); it++) {
+
+            auto patchId =
+                vcg::tri::Allocator<PolyMeshType>::template GetPerFaceAttribute<
+                    std::size_t>(*PolyM, MeshAttr::PATCH);
+
             vcg::Color4b currC =
-                vcg::Color4b::Scatter(NumPartitions, FacePatch[i]);
-            (*PolyM).face[i].C() = currC;
+                vcg::Color4b::Scatter(patchesSize, patchId[it]);
+
+            it->C() = currC;
         }
 
         // vcg::tri::io::ExporterOBJ<PolyMeshType>::Save(PolyM,PatchPath.c_str(),vcg::tri::io::Mask::IOM_FACECOLOR);
@@ -188,8 +181,15 @@ template <class PolyMeshType> class QuadMeshTracer {
 
     void SavePatchDecomposition(std::string &PatchFile) {
         FILE *f = fopen(PatchFile.c_str(), "wt");
-        for (size_t i = 0; i < FacePatch.size(); i++)
-            fprintf(f, "%d\n", FacePatch[i]);
+
+        auto patchId =
+            vcg::tri::Allocator<PolyMeshType>::template GetPerFaceAttribute<
+                std::size_t>(*PolyM, MeshAttr::PATCH);
+
+        for (auto it = PolyM->face.begin(); it != PolyM->face.end(); it++) {
+            fprintf(f, "%d\n", patchId[it]);
+        }
+
         fclose(f);
     }
 
@@ -208,12 +208,18 @@ template <class PolyMeshType> class QuadMeshTracer {
 
     std::set<std::pair<size_t, size_t>> getTraceEdges() { return TracedEdges; }
 
-    void TracePartitions() {
+    Status TracePartitions() {
         InitSingularities();
 
         DoTrace();
 
         patchesSize = SplitIntoPatches();
+
+        if (patchesSize) {
+            return Status::OK;
+        } else {
+            return Status::make(false, "Something is wrong!");
+        }
     }
 
     // QuadMeshTracer(PolyMeshType &_PolyM):PolyM(_PolyM){}

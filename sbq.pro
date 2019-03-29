@@ -54,7 +54,9 @@ SOURCES += \
     curvedraw.cpp \
     utils/qutils.cpp \
     utils/glutils.cpp \
-    meshattributes.cpp
+    meshattributes.cpp \
+    utils/utils.cpp \
+    utils/meshutils.cpp
 
 HEADERS += \
     precompiled_libraries.h \
@@ -73,7 +75,8 @@ HEADERS += \
     curvedraw.h \
     quad_tracer.h \
     utils/glutils.h \
-    meshattributes.h
+    meshattributes.h \
+    utils/meshutils.h
 
 FORMS += \
         mainwindow.ui
