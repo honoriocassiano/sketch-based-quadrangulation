@@ -51,6 +51,24 @@ void CurveDraw::draw() const {
 
     glEnd();
 
+    glDepthFunc(GL_LEQUAL);
+
+    // Draw simplified curve
+
+    glColor3f(1, 0, 0);
+    glPointSize(4);
+
+    glBegin(GL_POINTS);
+
+    for (const auto &p : curve.getPoints()) {
+        glVertex3f(p.x(), p.y(), p.z());
+    }
+
+    glEnd();
+
+    // End
+
+    glDepthFunc(GL_LESS);
     glEnable(GL_LIGHTING);
 }
 
@@ -72,6 +90,8 @@ void CurveDraw::addPoint(CMesh *mesh,
             addedPoints.push_back(point);
             curvePoints.push_back(point);
 
+            curve.add(PointN<float, 3>(point.V()));
+
             pointsMap.push_back(0);
 
         } else {
@@ -87,6 +107,7 @@ void CurveDraw::addPoint(CMesh *mesh,
 
                     points.push_back(point);
 
+                    curve.add(PointN<float, 3>(point.V()));
                     addedPoints.push_back(point);
                     faces.push_back(face);
                 }
@@ -306,6 +327,24 @@ void CurveDraw::reset() {
     pointsMap.clear();
     curvePoints.clear();
     faces.clear();
+    curve.clear();
+}
+
+void CurveDraw::simplify(float tol) {
+
+    PolygonalCurve<float, 3> result;
+
+    curve.douglasPeuckerSimplify(result, tol);
+
+    //    qDebug() << "before: " << result.size();
+
+    /// Resample
+    //    float desiredDist = result.length() / result.size();
+    //    result.superSample(desiredDist);
+
+    //    qDebug() << "after: " << result.size();
+
+    curve = result;
 }
 
 void CurveDraw::endDraw(CMesh *mesh,
@@ -314,8 +353,12 @@ void CurveDraw::endDraw(CMesh *mesh,
     addPoint(mesh, curvePoints.front(), faces.front(), viewDir, mvpMatrix,
              true);
 
+    curve.close(_loop);
+
     drawMode = false;
     loop = _loop;
+
+    simplify(0.01f);
 }
 
 #undef CROSS

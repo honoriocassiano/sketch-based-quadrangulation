@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "curvendimension/curven.hpp"
 #include "meshtypes.h"
 #include "utils/standardCamera.h"
 #include "utils/utils.h"
@@ -65,6 +66,12 @@ class CurveDraw {
      */
     void reset();
 
+    /*!
+     * \brief Reduce the number of points in curve
+     * \param tol tolerance to use on Douglas-Peucker algorithm
+     */
+    void simplify(float tol);
+
   private:
     void addPoint(CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &point,
                   CMesh::FacePointer face,
@@ -82,9 +89,31 @@ class CurveDraw {
     bool loop;
     bool drawMode;
     std::vector<CMesh::FacePointer> faces;
+
+    /*!
+     * \brief Maps addedPoints to curvePoints
+     *
+     * At position i, the value is the corresponding position of vertex
+     * addedPoints[i] in curvePoints, i.e., addedPoints[i] ==
+     * curvePoints[CMesh[i]]
+     */
     std::vector<std::size_t> pointsMap;
+
+    /*!
+     * \brief Points to be rendered
+     *
+     * If two consecutive points in addedPoints belongs to different faces, one
+     * or more new points are added on every edge the intersect the line between
+     * them
+     */
     std::vector<vcg::Point3<CMesh::ScalarType>> curvePoints;
+
+    /*!
+     * \brief Points created by the drawing
+     */
     std::vector<vcg::Point3<CMesh::ScalarType>> addedPoints;
+
+    PolygonalCurve<float, 3> curve;
 };
 
 #endif // CURVEDRAW2_H
