@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "QSignalMapper"
 #include "application.h"
 #include "qdebug.h"
 #include "qfiledialog.h"
@@ -18,6 +19,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this, SIGNAL(notifyStatusBar(QString)), ui->statusBar,
             SLOT(showMessage(QString)));
+
+    connect(ui->autoDistanceCheckBox, SIGNAL(toggled(bool)), this,
+            SLOT(switchAutoDistance(bool)));
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -44,5 +48,18 @@ void MainWindow::loadMesh() {
         ui->viewer->setFocus();
 
         emit notifyStatusBar(QString::fromStdString(status.message));
+    }
+}
+
+void MainWindow::switchAutoDistance(bool status) {
+
+    if (!status) {
+
+        // TODO Set auto distance based on last curve distances
+        ui->distanceLabel->setEnabled(true);
+        ui->distanceSpinBox->setEnabled(true);
+    } else {
+        ui->distanceLabel->setEnabled(false);
+        ui->distanceSpinBox->setEnabled(false);
     }
 }

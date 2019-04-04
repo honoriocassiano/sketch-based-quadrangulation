@@ -19,7 +19,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>121</width>
+      <width>221</width>
       <height>691</height>
      </rect>
     </property>
@@ -35,9 +35,9 @@
     <widget class="QToolButton" name="loadMeshButton">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>91</width>
+       <x>50</x>
+       <y>660</y>
+       <width>88</width>
        <height>24</height>
       </rect>
      </property>
@@ -45,8 +45,135 @@
       <string>Load mesh</string>
      </property>
     </widget>
+    <widget class="QFrame" name="frame_2">
+     <property name="geometry">
+      <rect>
+       <x>5</x>
+       <y>5</y>
+       <width>211</width>
+       <height>431</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QWidget" name="formLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>211</width>
+        <height>97</height>
+       </rect>
+      </property>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="leftMargin">
+        <number>5</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>5</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
+       <item row="2" column="0">
+        <widget class="QLabel" name="autoDistanceLabel">
+         <property name="statusTip">
+          <string>Auto distance to resample the curve</string>
+         </property>
+         <property name="whatsThis">
+          <string>Auto distance to resample the curve</string>
+         </property>
+         <property name="text">
+          <string>Auto distance</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="autoDistanceCheckBox">
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="toleranceDPLabel">
+         <property name="statusTip">
+          <string>Douglas Peucker tolerance</string>
+         </property>
+         <property name="whatsThis">
+          <string>Douglas Peucker tolerance</string>
+         </property>
+         <property name="accessibleName">
+          <string/>
+         </property>
+         <property name="accessibleDescription">
+          <string/>
+         </property>
+         <property name="text">
+          <string>Tolerance DP</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="toleranceDPSpinBox">
+         <property name="decimals">
+          <number>3</number>
+         </property>
+         <property name="minimum">
+          <double>0.001000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="distanceLabel">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="statusTip">
+          <string>Max distance between two vertices from the curve</string>
+         </property>
+         <property name="whatsThis">
+          <string>Max distance between two vertices from the curve</string>
+         </property>
+         <property name="text">
+          <string>Distance</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QDoubleSpinBox" name="distanceSpinBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="minimum">
+          <double>0.010000000000000</double>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </widget>
    <widget class="Viewer" name="viewer">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>-1</x>
@@ -54,6 +181,9 @@
       <width>1031</width>
       <height>731</height>
      </rect>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
     </property>
    </widget>
    <zorder>viewer</zorder>

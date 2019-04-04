@@ -17,6 +17,7 @@ class MainWindow : public QMainWindow {
 
   public slots:
     void loadMesh();
+    void switchAutoDistance(bool);
 
     //    void updateStatusBar(QString message);
 
