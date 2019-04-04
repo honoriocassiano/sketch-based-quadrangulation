@@ -51,7 +51,7 @@ void CurveDraw::draw() const {
 
     glEnd();
 
-    glDepthFunc(GL_LEQUAL);
+    glDepthFunc(GL_ALWAYS);
 
     // Draw simplified curve
 
@@ -332,19 +332,43 @@ void CurveDraw::reset() {
 
 void CurveDraw::simplify(float tol) {
 
-    PolygonalCurve<float, 3> result;
+    PolygonalCurve<float, 3> resultDP, resultFinal;
 
-    curve.douglasPeuckerSimplify(result, tol);
+    qDebug() << "before DP: " << curve.size();
 
-    //    qDebug() << "before: " << result.size();
+    curve.douglasPeuckerSimplify(resultDP, tol);
+
+    qDebug() << "after DP: " << resultDP.size();
 
     /// Resample
-    //    float desiredDist = result.length() / result.size();
-    //    result.superSample(desiredDist);
+    float desiredDist = resultDP.length() / resultDP.size();
 
-    //    qDebug() << "after: " << result.size();
+    for (unsigned i = 0; i < resultDP.size(); ++i) {
 
-    curve = result;
+        auto p1 = resultDP[i];
+        auto p2 = resultDP[(i + 1) % resultDP.size()];
+
+        float dist = p1.dist2(p2);
+
+        resultFinal.add(p1);
+
+        if (dist > desiredDist) {
+            int nPoints = int(ceil(dist / desiredDist));
+
+            for (int j = 0; j < nPoints; ++j) {
+
+                float a = float(j) / nPoints;
+
+                PointN<float, 3> p = a * p1 + (1 - a) * p2;
+
+                resultFinal.add(p);
+            }
+        }
+    }
+
+    qDebug() << "after RES: " << resultFinal.size();
+
+    curve = resultFinal;
 }
 
 void CurveDraw::endDraw(CMesh *mesh,
