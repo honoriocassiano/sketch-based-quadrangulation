@@ -30,6 +30,8 @@ class Viewer : public QGLViewer {
 
     void setFocus() { QGLViewer::setFocus(); }
 
+    float getMaxDistance() const { return app.getDrawer()->getMeanDistance(); }
+
   protected:
     void init() override;
     void draw() override;
@@ -45,8 +47,10 @@ class Viewer : public QGLViewer {
 
   signals:
     void notifyStatusBar(QString);
+    void setCurveParams(CurveDraw *);
 
   public slots:
+    void changeCurveParams();
 
   private:
     Application app;

@@ -61,6 +61,8 @@ class Application {
     Status hideDrawing();
     inline bool isShowingDrawing() const { return state.drawVisible; }
 
+    const inline CurveDraw *getDrawer() const { return &drawer; }
+
     inline CurveDraw *getDrawer() { return &drawer; }
 
     /*!

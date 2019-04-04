@@ -18,10 +18,12 @@ class MainWindow : public QMainWindow {
   public slots:
     void loadMesh();
     void switchAutoDistance(bool);
+    void changeCurveParams(CurveDraw *);
 
     //    void updateStatusBar(QString message);
 
   signals:
+    void updateViewer();
     void notifyStatusBar(QString);
 
   private:

@@ -60,7 +60,7 @@ void CurveDraw::draw() const {
 
     glBegin(GL_POINTS);
 
-    for (const auto &p : curve.getPoints()) {
+    for (const auto &p : currentCurve.getPoints()) {
         glVertex3f(p.x(), p.y(), p.z());
     }
 
@@ -90,7 +90,10 @@ void CurveDraw::addPoint(CMesh *mesh,
             addedPoints.push_back(point);
             curvePoints.push_back(point);
 
-            curve.add(PointN<float, 3>(point.V()));
+            auto p = PointN<float, 3>(point.V());
+
+            originalCurve.add(p);
+            currentCurve.add(p);
 
             pointsMap.push_back(0);
 
@@ -107,7 +110,11 @@ void CurveDraw::addPoint(CMesh *mesh,
 
                     points.push_back(point);
 
-                    curve.add(PointN<float, 3>(point.V()));
+                    auto p = PointN<float, 3>(point.V());
+
+                    originalCurve.add(p);
+                    currentCurve.add(p);
+
                     addedPoints.push_back(point);
                     faces.push_back(face);
                 }
@@ -327,33 +334,47 @@ void CurveDraw::reset() {
     pointsMap.clear();
     curvePoints.clear();
     faces.clear();
-    curve.clear();
+
+    originalCurve.clear();
+    currentCurve.clear();
 }
 
 void CurveDraw::simplify(float tol) {
 
-    PolygonalCurve<float, 3> resultDP, resultFinal;
+    PolygonalCurve<float, 3> result;
 
-    qDebug() << "before DP: " << curve.size();
+    qDebug() << "before DP: " << originalCurve.size();
 
-    curve.douglasPeuckerSimplify(resultDP, tol);
+    originalCurve.douglasPeuckerSimplify(result, tol);
 
-    qDebug() << "after DP: " << resultDP.size();
+    qDebug() << "after DP: " << result.size();
 
-    /// Resample
-    float desiredDist = resultDP.length() / resultDP.size();
+    currentCurve = result;
+}
 
-    for (unsigned i = 0; i < resultDP.size(); ++i) {
+void CurveDraw::resample() {
+    this->meanDistance = originalCurve.length() / originalCurve.size();
 
-        auto p1 = resultDP[i];
-        auto p2 = resultDP[(i + 1) % resultDP.size()];
+    resample(this->meanDistance);
+}
+
+void CurveDraw::resample(float maxDistance) {
+
+    PolygonalCurve<float, 3> result;
+
+    qDebug() << "before RES: " << originalCurve.size();
+
+    for (unsigned i = 0; i < originalCurve.size(); ++i) {
+
+        auto p1 = originalCurve[i];
+        auto p2 = originalCurve[(i + 1) % originalCurve.size()];
 
         float dist = p1.dist2(p2);
 
-        resultFinal.add(p1);
+        result.add(p1);
 
-        if (dist > desiredDist) {
-            int nPoints = int(ceil(dist / desiredDist));
+        if (dist > maxDistance) {
+            int nPoints = int(ceil(dist / maxDistance));
 
             for (int j = 0; j < nPoints; ++j) {
 
@@ -361,14 +382,14 @@ void CurveDraw::simplify(float tol) {
 
                 PointN<float, 3> p = a * p1 + (1 - a) * p2;
 
-                resultFinal.add(p);
+                result.add(p);
             }
         }
     }
 
-    qDebug() << "after RES: " << resultFinal.size();
+    qDebug() << "after RES: " << result.size();
 
-    curve = resultFinal;
+    currentCurve = result;
 }
 
 void CurveDraw::endDraw(CMesh *mesh,
@@ -377,12 +398,10 @@ void CurveDraw::endDraw(CMesh *mesh,
     addPoint(mesh, curvePoints.front(), faces.front(), viewDir, mvpMatrix,
              true);
 
-    curve.close(_loop);
+    originalCurve.close(_loop);
 
     drawMode = false;
     loop = _loop;
-
-    simplify(0.01f);
 }
 
 #undef CROSS

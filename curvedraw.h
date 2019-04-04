@@ -68,9 +68,35 @@ class CurveDraw {
 
     /*!
      * \brief Reduce the number of points in curve
+     *
+     * The maximum distance between two points is the curve length/number of
+     * points.
+     *
      * \param tol tolerance to use on Douglas-Peucker algorithm
      */
     void simplify(float tol);
+
+    /*!
+     * \brief Resample the curve by setting the maximum distance between two
+     * points to (curve length / number of points)
+     *
+     * The method also sets the meanDistance member.
+     */
+    void resample();
+
+    /*!
+     * \brief Resample the curve
+     *
+     * If the distance between two consecutive points if greater than
+     * maxDistance, the segment is splitted in by adding
+     * ceil(segment distance / maxDistance) points.
+     * The method also sets the meanDistance value.
+     *
+     * \param maxDistance maximum distance between two points
+     */
+    void resample(float maxDistance);
+
+    float getMeanDistance() const { return meanDistance; }
 
   private:
     void addPoint(CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &point,
@@ -87,6 +113,7 @@ class CurveDraw {
 
   private:
     bool loop;
+    float meanDistance;
     bool drawMode;
     std::vector<CMesh::FacePointer> faces;
 
@@ -113,7 +140,8 @@ class CurveDraw {
      */
     std::vector<vcg::Point3<CMesh::ScalarType>> addedPoints;
 
-    PolygonalCurve<float, 3> curve;
+    PolygonalCurve<float, 3> originalCurve;
+    PolygonalCurve<float, 3> currentCurve;
 };
 
 #endif // CURVEDRAW2_H

@@ -2,6 +2,7 @@
 #include "qdebug.h"
 
 #include "QGLViewer/manipulatedFrame.h"
+#include "mainwindow.h"
 
 #include "utils/intersection.h"
 #include "utils/qutils.h"
@@ -75,11 +76,14 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
                 float matrix[16];
                 camera()->getModelViewProjectionMatrix(matrix);
 
-                app.getDrawer()->endDraw(app.getMesh()->getTrimesh(),
-                                         qtToVCG(camera()->viewDirection()),
-                                         matrix);
+                auto drawer = app.getDrawer();
+
+                drawer->endDraw(app.getMesh()->getTrimesh(),
+                                qtToVCG(camera()->viewDirection()), matrix);
 
                 lastState.valid = false;
+
+                emit setCurveParams(drawer);
             }
 
         } else {
@@ -179,6 +183,8 @@ void Viewer::keyPressEvent(QKeyEvent *e) {
 
     update();
 }
+
+void Viewer::changeCurveParams() { emit setCurveParams(app.getDrawer()); }
 
 void Viewer::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
