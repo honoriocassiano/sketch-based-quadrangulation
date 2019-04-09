@@ -76,7 +76,8 @@ HEADERS += \
     quad_tracer.h \
     utils/glutils.h \
     meshattributes.h \
-    utils/meshutils.h
+    utils/meshutils.h \
+    utils/debug.h
 
 FORMS += \
         mainwindow.ui

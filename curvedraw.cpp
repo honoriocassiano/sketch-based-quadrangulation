@@ -1,4 +1,5 @@
 #include "curvedraw.h"
+#include "utils/debug.h"
 #include "utils/glutils.h"
 #include "vcg/complex/algorithms/update/flag.h"
 #include "vcg/simplex/face/pos.h"
@@ -6,7 +7,7 @@
 #include "wrap/gl/space.h"
 
 // TODO Remove these includes
-#include "qdebug.h"
+
 #include "utils/qutils.h"
 
 namespace qgl = qglviewer;
@@ -233,7 +234,7 @@ bool CurveDraw::getCurvePointsBetween(
     while (currentFace != f2) {
 
         if (currentFace == nullptr || currentFace->IsV()) {
-            qDebug() << "No path found between " << p1 << " and " << p2;
+            Debug() << "No path found between " << p1 << " and " << p2;
 
             hasPath = false;
             points.clear();
@@ -343,11 +344,11 @@ void CurveDraw::simplify(float tol) {
 
     PolygonalCurve<float, 3> result;
 
-    qDebug() << "before DP: " << originalCurve.size();
+    Debug() << "before DP: " << originalCurve.size();
 
     originalCurve.douglasPeuckerSimplify(result, tol);
 
-    qDebug() << "after DP: " << result.size();
+    Debug() << "after DP: " << result.size();
 
     currentCurve = result;
 
@@ -360,7 +361,7 @@ void CurveDraw::resample(float maxDistance) {
 
     PolygonalCurve<float, 3> result;
 
-    qDebug() << "before RES: " << originalCurve.size();
+    Debug() << "before RES: " << originalCurve.size();
 
     for (unsigned i = 0; i < originalCurve.size(); ++i) {
 
@@ -385,7 +386,7 @@ void CurveDraw::resample(float maxDistance) {
         }
     }
 
-    qDebug() << "after RES: " << result.size();
+    Debug() << "after RES: " << result.size();
 
     currentCurve = result;
 }

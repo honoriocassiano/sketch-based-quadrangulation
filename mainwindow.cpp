@@ -3,8 +3,8 @@
 
 #include "QSignalMapper"
 #include "application.h"
-#include "qdebug.h"
 #include "qfiledialog.h"
+#include "utils/debug.h"
 
 #include "utils/utils.h"
 
@@ -90,6 +90,7 @@ void MainWindow::changeCurveParams(CurveDraw *curve) {
 
     if (ui->autoDistanceCheckBox->isChecked()) {
         curve->resample();
+
     } else {
         curve->resample(float(ui->distanceSpinBox->value()));
     }
