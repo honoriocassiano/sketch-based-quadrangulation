@@ -15,11 +15,11 @@ QDebug operator<<(QDebug dbg, const vcg::Point3<PMesh::ScalarType> &p) {
 }
 
 vcg::Point3<float> qtToVCG(const qglviewer::Vec &v) {
-    return vcg::Point3<float>(v.x, v.y, v.z);
+    return vcg::Point3<float>(float(v.x), float(v.y), float(v.z));
 }
 
 qglviewer::Vec vcgToQT(const vcg::Point3<float> &v) {
-    return qglviewer::Vec(v.X(), v.Y(), v.Z());
+    return qglviewer::Vec(double(v.X()), double(v.Y()), double(v.Z()));
 }
 
 /*!
