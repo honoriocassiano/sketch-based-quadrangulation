@@ -350,13 +350,11 @@ void CurveDraw::simplify(float tol) {
     qDebug() << "after DP: " << result.size();
 
     currentCurve = result;
+
+    this->meanDistance = currentCurve.length() / currentCurve.size();
 }
 
-void CurveDraw::resample() {
-    this->meanDistance = originalCurve.length() / originalCurve.size();
-
-    resample(this->meanDistance);
-}
+void CurveDraw::resample() { resample(this->meanDistance); }
 
 void CurveDraw::resample(float maxDistance) {
 
@@ -399,6 +397,8 @@ void CurveDraw::endDraw(CMesh *mesh,
              true);
 
     originalCurve.close(_loop);
+
+    this->meanDistance = originalCurve.length() / originalCurve.size();
 
     drawMode = false;
     loop = _loop;
