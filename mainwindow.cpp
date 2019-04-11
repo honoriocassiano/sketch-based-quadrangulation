@@ -68,17 +68,24 @@ void MainWindow::switchAutoDistance(bool status) {
 
         /// Prevent to update drawer
         ui->distanceSpinBox->blockSignals(true);
-
         ui->distanceSpinBox->setValue(double(ui->viewer->getMaxDistance()));
-
         ui->distanceSpinBox->blockSignals(false);
 
         /// Enable distance parameters
         ui->distanceLabel->setEnabled(true);
         ui->distanceSpinBox->setEnabled(true);
     } else {
+        /// Disable distance parameters
         ui->distanceLabel->setEnabled(false);
         ui->distanceSpinBox->setEnabled(false);
+
+        /// Prevent to update drawer
+        ui->distanceSpinBox->blockSignals(true);
+        ui->distanceSpinBox->setValue(double(ui->viewer->getMaxDistance()));
+        ui->distanceSpinBox->blockSignals(false);
+
+        /// Update drawer params
+        ui->viewer->changeCurveParams();
     }
 }
 
