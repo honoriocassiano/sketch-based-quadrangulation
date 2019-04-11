@@ -109,22 +109,18 @@ class CurveDraw {
         CMesh::FacePointer f1, const vcg::Point3<CMesh::ScalarType> &p2,
         CMesh::FacePointer f2, const vcg::Point3<CMesh::ScalarType> &viewDir,
         float mvpMatrix[16],
-        std::vector<vcg::Point3<CMesh::ScalarType>> &points);
+        std::vector<vcg::Point3<CMesh::ScalarType>> &points,
+        std::vector<VertexData<CMesh>> &collisions);
 
   private:
     bool loop;
     float meanDistance;
     bool drawMode;
-    std::vector<CMesh::FacePointer> faces;
 
     /*!
-     * \brief Maps addedPoints to curvePoints
-     *
-     * At position i, the value is the corresponding position of vertex
-     * addedPoints[i] in curvePoints, i.e., addedPoints[i] ==
-     * curvePoints[CMesh[i]]
+     * \brief Holds the faces/edges that contains every point in curvePoints
      */
-    std::vector<std::size_t> pointsMap;
+    std::vector<VertexData<CMesh>> faces;
 
     /*!
      * \brief Points to be rendered
