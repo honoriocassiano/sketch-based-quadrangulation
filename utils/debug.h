@@ -21,36 +21,36 @@ static void myMessageOutput(QtMsgType type, const QMessageLogContext &context,
         const char *function = context.function ? context.function : "";
         switch (type) {
         case QtDebugMsg:
-            fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(),
-                    file, context.line, function);
+            fprintf(stderr, "%s (%s:%u)\n", localMsg.constData(), file,
+                    context.line);
             break;
         case QtInfoMsg:
-            fprintf(stderr, "Info: %s (%s:%u, %s)\n", localMsg.constData(),
-                    file, context.line, function);
+            fprintf(stderr, "Info: %s (%s:%u)\n", localMsg.constData(), file,
+                    context.line);
             break;
         case QtWarningMsg:
-            fprintf(stderr, "Warning: %s (%s:%u, %s)\n", localMsg.constData(),
-                    file, context.line, function);
+            fprintf(stderr, "Warning: %s (%s:%u)\n", localMsg.constData(), file,
+                    context.line);
             break;
         case QtCriticalMsg:
-            fprintf(stderr, "Critical: %s (%s:%u, %s)\n", localMsg.constData(),
-                    file, context.line, function);
+            fprintf(stderr, "Critical: %s (%s:%u)\n", localMsg.constData(),
+                    file, context.line);
             break;
         case QtFatalMsg:
-            fprintf(stderr, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(),
-                    file, context.line, function);
+            fprintf(stderr, "Fatal: %s (%s:%u)\n", localMsg.constData(), file,
+                    context.line);
             break;
         }
     }
 }
 
-inline QDebug Debug() { return qDebug(); }
+#define Debug() qDebug()
 
 #else
 
 #include <iostream>
 
-inline std::ostream &Debug() {
+inline std::ostream &_debug() {
 
     std::cout.clear();
 
@@ -60,6 +60,9 @@ inline std::ostream &Debug() {
 
     return std::cout;
 }
+
+/// Debugger if not using Qt
+#define Debug() _debug()
 
 #endif
 
