@@ -5,6 +5,8 @@
 
 #include "curvendimension/curven.hpp"
 #include "meshtypes.h"
+#include "sketchcurve.h"
+#include "sketchvertex.h"
 #include "utils/standardCamera.h"
 #include "utils/utils.h"
 
@@ -19,12 +21,6 @@ class CurveDraw {
      * \return state of drawing
      */
     bool isDrawing() const;
-
-    /*!
-     * \brief Get all points added to drawing
-     * \return vector containing the points
-     */
-    std::vector<vcg::Point3<CMesh::ScalarType>> getPoints() const;
 
     void draw() const;
 
@@ -58,7 +54,7 @@ class CurveDraw {
      * \brief Get the number of points added to draw
      * \return number of points
      */
-    inline std::size_t getSize() const { return addedPoints.size(); }
+    inline std::size_t getSize() const { return originalCurve.size(); }
 
     /*!
      * \brief Delete all added points (but not deactivate drawing mode)
@@ -104,40 +100,21 @@ class CurveDraw {
                   const vcg::Point3<CMesh::ScalarType> &viewDir,
                   float viewProjectionMatrix[16], bool lastPoint);
 
-    bool getCurvePointsBetween(
-        CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &p1,
-        CMesh::FacePointer f1, const vcg::Point3<CMesh::ScalarType> &p2,
-        CMesh::FacePointer f2, const vcg::Point3<CMesh::ScalarType> &viewDir,
-        float mvpMatrix[16],
-        std::vector<vcg::Point3<CMesh::ScalarType>> &points,
-        std::vector<VertexData<CMesh>> &collisions);
+    bool getCurvePointsBetween(CMesh *mesh,
+                               const vcg::Point3<CMesh::ScalarType> &p1,
+                               CMesh::FacePointer f1,
+                               const vcg::Point3<CMesh::ScalarType> &p2,
+                               CMesh::FacePointer f2,
+                               const vcg::Point3<CMesh::ScalarType> &viewDir,
+                               float mvpMatrix[16], SketchCurve &result);
 
   private:
     bool loop;
     float meanDistance;
     bool drawMode;
 
-    /*!
-     * \brief Holds the faces/edges that contains every point in curvePoints
-     */
-    std::vector<VertexData<CMesh>> faces;
-
-    /*!
-     * \brief Points to be rendered
-     *
-     * If two consecutive points in addedPoints belongs to different faces, one
-     * or more new points are added on every edge the intersect the line between
-     * them
-     */
-    std::vector<vcg::Point3<CMesh::ScalarType>> curvePoints;
-
-    /*!
-     * \brief Points created by the drawing
-     */
-    std::vector<vcg::Point3<CMesh::ScalarType>> addedPoints;
-
-    PolygonalCurve<float, 3> originalCurve;
-    PolygonalCurve<float, 3> currentCurve;
+    SketchCurve originalCurve;
+    SketchCurve currentCurve;
 };
 
 #endif // CURVEDRAW2_H

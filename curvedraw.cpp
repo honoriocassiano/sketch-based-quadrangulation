@@ -29,10 +29,6 @@ CurveDraw::~CurveDraw() {}
 
 bool CurveDraw::isDrawing() const { return drawMode; }
 
-std::vector<vcg::Point3<CMesh::ScalarType>> CurveDraw::getPoints() const {
-    return addedPoints;
-}
-
 void CurveDraw::draw() const {
     glDisable(GL_LIGHTING);
 
@@ -46,7 +42,7 @@ void CurveDraw::draw() const {
         glBegin(GL_LINE_STRIP);
     }
 
-    for (const auto &p : curvePoints) {
+    for (const auto &p : originalCurve.getPoints()) {
         vcg::glVertex(p);
     }
 
@@ -86,45 +82,30 @@ void CurveDraw::addPoint(CMesh *mesh,
                          float mvpMatrix[16], bool lastPoint) {
     if (drawMode) {
 
-        if (faces.empty() || face == faces.back().getFace()) {
-            faces.emplace_back(face);
-            addedPoints.push_back(point);
-            curvePoints.push_back(point);
-
-            auto p = PointN<float, 3>(point.V());
+        if (originalCurve.isEmpty() || face == originalCurve.back().getFace()) {
+            auto p = SketchVertex<CMesh>(point, face);
 
             originalCurve.add(p);
             currentCurve.add(p);
 
         } else {
 
-            std::vector<vcg::Point3<CMesh::ScalarType>> points;
-            std::vector<VertexData<CMesh>> collisions;
+            SketchCurve temp;
 
             bool pathExists = getCurvePointsBetween(
-                mesh, addedPoints.back(), faces.back().getFace(), point, face,
-                viewDir, mvpMatrix, points, collisions);
+                mesh, originalCurve.back(), originalCurve.back().getFace(),
+                point, face, viewDir, mvpMatrix, temp);
 
             if (pathExists) {
                 if (!lastPoint) {
 
-                    points.push_back(point);
+                    auto p = SketchVertex<CMesh>(point, face);
 
-                    auto p = PointN<float, 3>(point.V());
-
-                    originalCurve.add(p);
-                    currentCurve.add(p);
-
-                    addedPoints.push_back(point);
-                    faces.emplace_back(face);
+                    temp.add(p);
                 }
 
-                curvePoints.reserve(curvePoints.size() + points.size());
-                curvePoints.insert(curvePoints.end(), points.begin(),
-                                   points.end());
-
-                curvePoints.reserve(faces.size() + collisions.size());
-                faces.insert(faces.end(), collisions.begin(), collisions.end());
+                originalCurve.join(temp);
+                currentCurve.join(temp);
             }
         }
     }
@@ -134,8 +115,7 @@ bool CurveDraw::getCurvePointsBetween(
     CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &p1,
     CMesh::FacePointer f1, const vcg::Point3<CMesh::ScalarType> &p2,
     CMesh::FacePointer f2, const vcg::Point3<CMesh::ScalarType> &viewDir,
-    float mvpMatrix[], std::vector<vcg::Point3<CMesh::ScalarType>> &points,
-    std::vector<VertexData<CMesh>> &collisions) {
+    float mvpMatrix[], SketchCurve &result) {
 
     bool hasPath = true;
 
@@ -207,16 +187,14 @@ bool CurveDraw::getCurvePointsBetween(
         vcg::Line3<CMesh::ScalarType> edgeLine(edgePoint1,
                                                (edgePoint2 - edgePoint1));
 
-        CROSS(normal, viewDir, (addedPoints.back() - p2));
+        CROSS(normal, viewDir, (vcg::Point3<float>(originalCurve.back()) - p2));
 
         plane.Init(p2, normal);
 
         /// Calculate the intersection point on 3D space
         vcg::IntersectionPlaneLine(plane, edgeLine, intersection);
 
-        /// Add point to possible curve points
-        points.push_back(intersection);
-        collisions.emplace_back(currentFace, lastEdge);
+        result.add(SketchVertex<CMesh>(intersection, currentFace, lastEdge));
 
         currentFace->SetV();
     }
@@ -239,8 +217,8 @@ bool CurveDraw::getCurvePointsBetween(
             Debug() << "No path found between " << p1 << " and " << p2;
 
             hasPath = false;
-            points.clear();
-            faces.clear();
+
+            result.clear();
             break;
         }
 
@@ -298,7 +276,7 @@ bool CurveDraw::getCurvePointsBetween(
         vcg::Line3<CMesh::ScalarType> edgeLine(edgePoint1,
                                                (edgePoint2 - edgePoint1));
 
-        CROSS(normal, viewDir, (addedPoints.back() - p2));
+        CROSS(normal, viewDir, (vcg::Point3<float>(originalCurve.back()) - p2));
 
         plane.Init(p2, normal);
 
@@ -306,9 +284,7 @@ bool CurveDraw::getCurvePointsBetween(
         vcg::IntersectionPlaneLine(plane, edgeLine, intersection);
 
         /// Add point to possible curve points
-        points.push_back(intersection);
-
-        collisions.emplace_back(currentFace, lastEdge);
+        result.add(SketchVertex<CMesh>(intersection, currentFace, lastEdge));
 
         /// New Pos
         pos = vcg::face::Pos<CMesh::FaceType>(currentFace, nextEdge);
@@ -336,17 +312,13 @@ void CurveDraw::addPoint(CMesh *mesh,
 }
 
 void CurveDraw::reset() {
-    addedPoints.clear();
-    curvePoints.clear();
-    faces.clear();
-
     originalCurve.clear();
     currentCurve.clear();
 }
 
 void CurveDraw::simplify(float tol) {
 
-    PolygonalCurve<float, 3> result;
+    SketchCurve result;
 
     Debug() << "before DP: " << originalCurve.size();
 
@@ -363,7 +335,7 @@ void CurveDraw::resample() { resample(this->meanDistance); }
 
 void CurveDraw::resample(float maxDistance) {
 
-    PolygonalCurve<float, 3> result;
+    SketchCurve result;
 
     Debug() << "before RES: " << originalCurve.size();
 
@@ -398,8 +370,9 @@ void CurveDraw::resample(float maxDistance) {
 void CurveDraw::endDraw(CMesh *mesh,
                         const vcg::Point3<CMesh::ScalarType> &viewDir,
                         float mvpMatrix[16], bool _loop) {
-    addPoint(mesh, curvePoints.front(), faces.front().getFace(), viewDir,
-             mvpMatrix, true);
+
+    addPoint(mesh, originalCurve.front(), originalCurve.front().getFace(),
+             viewDir, mvpMatrix, true);
 
     originalCurve.close(_loop);
 

@@ -56,7 +56,8 @@ SOURCES += \
     utils/glutils.cpp \
     meshattributes.cpp \
     utils/utils.cpp \
-    utils/meshutils.cpp
+    utils/meshutils.cpp \
+    sketchcurve.cpp
 
 HEADERS += \
     precompiled_libraries.h \
@@ -77,7 +78,9 @@ HEADERS += \
     utils/glutils.h \
     meshattributes.h \
     utils/meshutils.h \
-    utils/debug.h
+    utils/debug.h \
+    sketchvertex.h \
+    sketchcurve.h
 
 FORMS += \
         mainwindow.ui
