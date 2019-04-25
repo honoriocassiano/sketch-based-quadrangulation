@@ -52,12 +52,17 @@ void CurveDraw::draw() const {
 
     // Draw simplified curve
 
-    glColor3f(1, 0, 0);
     glPointSize(4);
 
     glBegin(GL_POINTS);
 
     for (const auto &p : currentCurve.getPoints()) {
+        if (p.hasEdge()) {
+            glColor3f(0, 0, 1);
+        } else {
+            glColor3f(1, 0, 0);
+        }
+
         glVertex3f(p.x(), p.y(), p.z());
     }
 
@@ -322,7 +327,8 @@ void CurveDraw::simplify(float tol) {
 
     Debug() << "before DP: " << originalCurve.size();
 
-    originalCurve.douglasPeuckerSimplify(result, tol);
+    //    originalCurve.douglasPeuckerSimplify(result, tol);
+    originalCurve.douglasPeuckerSimplifyIgnoreEdges(result, tol);
 
     Debug() << "after DP: " << result.size();
 
