@@ -5,7 +5,7 @@
 #include "vcg/complex/algorithms/update/topology.h"
 #include <wrap/gl/space.h>
 
-Application::Application() {}
+Application::Application() : currentMode(Mode::DRAW) {}
 
 Application::~Application() {}
 
@@ -54,6 +54,27 @@ Status Application::hideMesh() {
     state.meshVisible = false;
 
     return Status::OK;
+}
+
+bool Application::switchToMode(Mode m) {
+
+    switch (currentMode) {
+    case Mode::DRAW:
+        if (m == Mode::EDIT_CURVE) {
+            if (!drawer.isDrawing() && !drawer.isEmpty()) {
+                currentMode = m;
+            }
+        }
+        break;
+
+    case Mode::EDIT_CURVE:
+        if (m == Mode::DRAW) {
+            currentMode = m;
+        }
+        break;
+    }
+
+    return (currentMode == m);
 }
 
 void Application::draw() {

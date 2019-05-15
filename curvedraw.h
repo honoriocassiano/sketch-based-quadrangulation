@@ -32,6 +32,11 @@ class CurveDraw {
      */
     bool isDrawing() const;
 
+    /*!
+     * \brief Draw vertices using its position as color, starting from blue.
+     */
+    void drawPicking() const;
+
     void draw() const;
 
     /*!
@@ -65,6 +70,8 @@ class CurveDraw {
      * \return number of points
      */
     inline std::size_t getSize() const { return originalCurve.size(); }
+
+    inline bool isEmpty() const { return (originalCurve.size() == 0); }
 
     /*!
      * \brief Delete all added points (but not deactivate drawing mode)
@@ -105,6 +112,8 @@ class CurveDraw {
     float getMeanDistance() const { return meanDistance; }
 
   private:
+    void glInit();
+
     void addPoint(CMesh *mesh, const vcg::Point3<CMesh::ScalarType> &point,
                   CMesh::FacePointer face,
                   const vcg::Point3<CMesh::ScalarType> &viewDir,

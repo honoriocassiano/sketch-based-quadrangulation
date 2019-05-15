@@ -34,7 +34,7 @@ CurveDraw::Config CurveDraw::config = {
  CURVEDRAW CLASS DEFINITIONS
 */
 
-CurveDraw::CurveDraw() : drawMode(false) {}
+CurveDraw::CurveDraw() : drawMode(false) { glInit(); }
 
 CurveDraw::~CurveDraw() {}
 
@@ -82,6 +82,40 @@ void CurveDraw::draw() const {
     // End
 
     glDepthFunc(GL_LESS);
+    glEnable(GL_LIGHTING);
+}
+
+void CurveDraw::drawPicking() const {
+
+    glPointSize(config.pointSize * 5);
+
+    glDisable(GL_LIGHTING);
+
+    glBegin(GL_POINTS);
+
+    for (unsigned i = 0; i < currentCurve.getPoints().size(); i++) {
+
+        auto p = currentCurve[i];
+
+        if (!p.hasEdge()) {
+
+            auto index = i + 1;
+
+            int r = (index & 0x000000FF) >> 0;
+            int g = (index & 0x0000FF00) >> 8;
+            int b = (index & 0x00FF0000) >> 16;
+
+            //            r = GLubyte(index / (1 << 16));
+            //            g = GLubyte((index % (1 << 16)) / (1 << 8));
+            //            b = GLubyte(index % (1 << 8));
+
+            glColor3i(r, g, b);
+            vcg::glVertex(p);
+        }
+    }
+
+    glEnd();
+
     glEnable(GL_LIGHTING);
 }
 
@@ -382,6 +416,12 @@ void CurveDraw::resample(float maxDistance) {
     Debug() << "after RES: " << result.size();
 
     currentCurve = result;
+}
+
+void CurveDraw::glInit() {
+    //    glGenFramebuffers(1, &fboSelection);
+    //    glGenTextures(1, &texSelection);
+    //    glGenRenderbuffers(1, &depthSelection);
 }
 
 void CurveDraw::endDraw(CMesh *mesh,

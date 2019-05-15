@@ -30,7 +30,23 @@ class Viewer : public QGLViewer {
 
     void setFocus() { QGLViewer::setFocus(); }
 
+    void beginSelectMode();
+
+    void endSelectMode();
+
+    bool editCurve(QMouseEvent *e);
+
+    bool drawCurve(QMouseEvent *e);
+
+    bool getSelectedVertex(int x, int y, std::size_t &pos);
+
     float getMaxDistance() const { return app.getDrawer()->getMeanDistance(); }
+
+    GLuint getFboSelection() const;
+
+    GLuint getTexSelection() const;
+
+    GLuint getDepthSelection() const;
 
   protected:
     void init() override;
@@ -56,6 +72,10 @@ class Viewer : public QGLViewer {
     Application app;
 
     LastState lastState;
+
+    GLuint fboSelection;
+    GLuint texSelection;
+    GLuint depthSelection;
 
     //    PMesh::FacePointer lastFace;
     //    vcg::Point3<PMesh::ScalarType> lastHitPoint;

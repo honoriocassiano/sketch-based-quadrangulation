@@ -20,7 +20,14 @@ class Application {
     };
 
   public:
+    enum class Mode { DRAW, EDIT_CURVE };
+
+  public:
     Application();
+
+    bool switchToMode(Mode m);
+
+    Mode getMode() const { return currentMode; }
 
     virtual ~Application();
 
@@ -78,6 +85,8 @@ class Application {
     CurveDraw drawer;
 
     CurrentState state;
+
+    Mode currentMode;
 };
 
 #endif // APPLICATION_H
