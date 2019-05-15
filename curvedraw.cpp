@@ -20,6 +20,17 @@ namespace qgl = qglviewer;
     }
 
 /*
+ CURVEDRAW CLASS STATIC MEMBERS
+*/
+
+CurveDraw::Config CurveDraw::config = {
+    /*pointSize*/ 4,
+    /*lineWidth*/ 2.5,
+    /*lineColor*/ {0, 1, 0},
+    /*drawPointColor*/ {1, 0, 0},
+    /*edgePointColor*/ {0, 0, 1}};
+
+/*
  CURVEDRAW CLASS DEFINITIONS
 */
 
@@ -32,9 +43,9 @@ bool CurveDraw::isDrawing() const { return drawMode; }
 void CurveDraw::draw() const {
     glDisable(GL_LIGHTING);
 
-    glColor3f(0, 1, 0);
+    glColor3fv(config.lineColor);
 
-    glLineWidth(2.5);
+    glLineWidth(config.lineWidth);
 
     if (loop) {
         glBegin(GL_LINE_LOOP);
@@ -52,15 +63,15 @@ void CurveDraw::draw() const {
 
     // Draw simplified curve
 
-    glPointSize(4);
+    glPointSize(config.pointSize);
 
     glBegin(GL_POINTS);
 
     for (const auto &p : currentCurve.getPoints()) {
         if (p.hasEdge()) {
-            glColor3f(0, 0, 1);
+            glColor3fv(config.edgePointColor);
         } else {
-            glColor3f(1, 0, 0);
+            glColor3fv(config.drawPointColor);
         }
 
         glVertex3f(p.x(), p.y(), p.z());

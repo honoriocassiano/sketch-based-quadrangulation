@@ -12,6 +12,16 @@
 
 class CurveDraw {
 
+  private:
+    struct Config {
+        float pointSize;
+        float lineWidth;
+
+        float lineColor[3];
+        float drawPointColor[3];
+        float edgePointColor[3];
+    };
+
   public:
     CurveDraw();
     virtual ~CurveDraw();
@@ -107,6 +117,9 @@ class CurveDraw {
                                CMesh::FacePointer f2,
                                const vcg::Point3<CMesh::ScalarType> &viewDir,
                                float mvpMatrix[16], SketchCurve &result);
+
+  public:
+    static Config config;
 
   private:
     bool loop;
