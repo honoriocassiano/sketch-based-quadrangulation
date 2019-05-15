@@ -71,7 +71,7 @@ void Viewer::mousePressEvent(QMouseEvent *e) {
                 lastState.hitFace = face;
                 lastState.hitPoint = hitPoint;
                 lastState.valid = true;
-            } else {
+            } else if (app.getDrawer()->getSize() > 3) {
 
                 float matrix[16];
                 camera()->getModelViewProjectionMatrix(matrix);
