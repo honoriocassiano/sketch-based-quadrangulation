@@ -90,10 +90,11 @@ void CurveDraw::drawPicking() const {
     glPointSize(config.pointSize * 5);
 
     glDisable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
 
     glBegin(GL_POINTS);
 
-    for (unsigned i = 0; i < currentCurve.getPoints().size(); i++) {
+    for (unsigned i = 0; i < currentCurve.size(); i++) {
 
         auto p = currentCurve[i];
 
@@ -101,21 +102,30 @@ void CurveDraw::drawPicking() const {
 
             auto index = i + 1;
 
-            int r = (index & 0x000000FF) >> 0;
-            int g = (index & 0x0000FF00) >> 8;
-            int b = (index & 0x00FF0000) >> 16;
+            //            int r = (index & 0x000000FF) >> 0;
+            //            int g = (index & 0x0000FF00) >> 8;
+            //            int b = (index & 0x00FF0000) >> 16;
 
-            //            r = GLubyte(index / (1 << 16));
-            //            g = GLubyte((index % (1 << 16)) / (1 << 8));
-            //            b = GLubyte(index % (1 << 8));
+            int r, g, b;
+
+            //            r = g = b = 255;
+
+            r = GLubyte(index / (1 << 16));
+            g = GLubyte((index % (1 << 16)) / (1 << 8));
+            b = GLubyte(index % (1 << 8));
 
             glColor3i(r, g, b);
             vcg::glVertex(p);
         }
     }
 
+    //    glColor3ub(255, 255, 255);
+    //    //    glVertex3f(0, 0, 0);
+    //    glVertex2f(0, 0);
+
     glEnd();
 
+    glDisable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
 }
 

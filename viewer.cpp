@@ -9,6 +9,8 @@
 #include "utils/qutils.h"
 #include "vcg/complex/algorithms/intersection.h"
 
+#include <QImageWriter>
+
 namespace qgl = qglviewer;
 
 void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id,
@@ -68,13 +70,37 @@ void Viewer::beginSelectMode() {
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width(), height(), 0, GL_RGB,
                  GL_UNSIGNED_BYTE, nullptr);
+
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
                            texSelection, 0);
 
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    GLfloat matrix[16];
+
+    camera()->getProjectionMatrix(matrix);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    glLoadMatrix(matrix);
+
+    camera()->getModelViewMatrix(matrix);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glLoadMatrix(matrix);
 }
 
 void Viewer::endSelectMode() {
+
+    //    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) !=
+    //    GL_FRAMEBUFFER_COMPLETE) {
+    //        Debug() << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
+    //    }
+
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -172,10 +198,40 @@ bool Viewer::getSelectedVertex(int x, int y, size_t &pos) {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fboSelection);
     glReadBuffer(GL_COLOR_ATTACHMENT0);
 
+    //    glBlitFramebuffer(0, 0, width(), height(), 0, 0, width(), height(),
+    //                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
     //    pixels = glReadPixels(point[0], self.__dimension[1] - point[1], 1, 1,
     //                          GL_RGB, GL_UNSIGNED_BYTE);
 
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    // ***************************************************
+    int w = width(), h = height();
+
+    //    Debug() << "w: " << w << " h: " << h;
+
+    GLubyte *data = new GLubyte[3 * w * h];
+    //    GLubyte data[3 * w * h];
+
+    for (int i = 0; i < (3 * w * h); i++) {
+        data[i] = 0;
+    }
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    //    glBindTexture(GL_TEXTURE_2D, texSelection);
+    //    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    //    glBindTexture(GL_TEXTURE_2D, 0);
+
+    auto image = QImage(data, w, h, 3 * w, QImage::Format_RGB888);
+
+    QImageWriter writer("abcde.png");
+    writer.write(image);
+
+    delete[] data;
+    // ***************************************************
 
     glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
